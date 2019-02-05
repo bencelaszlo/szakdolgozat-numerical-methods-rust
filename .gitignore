@@ -1,0 +1,20 @@
+# latex/pdflatex auxiliary files:
+*.toc
+*.thm
+*.aux
+*.aux~
+*.log
+*.out
+*.tex~
+*.sty~
+*.fls
+
+# Intermediate documents:
+*.dvi
+*.xdv
+dolgozat.pdf
+dolgozat/cimlap/ME_logo-eps-converted-to.pdf
+
+# Build tool auxiliary files
+*.synctex.gz
+*.fdb_latexmk
