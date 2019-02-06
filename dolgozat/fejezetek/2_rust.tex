@@ -1,6 +1,89 @@
 \Chapter{A Rust programozási nyelv}
 
-% Története, kialakulása, támogatottsága
-% Fő jellemzői, sajátosságai
-% Viszonya más nyelvekkel
+\section{Története, kialakulása}
+A Rust programozási nyelv története 2006-ban kezdődött, Graydon Hoare személyes projektjeként. A Mozilla Alapítvány (Mozilla Organization) 2009-ben csatlakozott a projekthez, amikorra a nyelv már képes volt alapvető tulajdonságainak bemutatására. %(https://web.archive.org/web/20160305231140/https://www.rust-lang.org/faq.html)
 
+A Rust továbbra is a Mozilla támogatását élvezi, de nem áll a Mozilla irányítása alatt. A projekt irányítását egy több vezető fejlesztő által alkotott csapat végzi %(https://github.com/rust-lang/rust-wiki-backup/blob/master/Note-core-team.md).
+Magához a Rust programozási nyelvhez mára több, mint 2000-ren járultak hozzá. %(https://github.com/rust-lang/rust/graphs/contributors)
+
+\section{Jellemzői}
+%(https://web.archive.org/web/20170609052346/https://www.rust-lang.org/en-US/)
+A Rust egy rendszerprogramozási nyelv, melynek felépítése a memóriabiztonságot és a tread-safety-t garantáló párhuzamosságot helyezi előtérbe.
+
+zéróköltségű absztrakciók, move szemantikák, garantált memóriabiztonság, threads without data races, trait-alapú generikusok, mintaillesztés, típus-inference, minimális runtime, hatékony C bindings
+
+\section{Viszonya más programozási nyelvekkel}
+A Rust viszonylagos „fiatalsága” következtében több már meglévő programozási nyelv felépítéséből meríthetett. Ez a fejlesztői által is elismert %(https://doc.rust-lang.org/reference/influences.html)
+tény. A nyelv eddigi története során több változtatást is megélt, az alábbiakban részletezésre kerül minden más nyelv, amely - legyen aktuális, vagy korábbi - hatást fejtett ki a Rustra.
+
+\subsection{SML, OCaml (algebrai adattípusok, mintaillesztés, típus inference, pontosvesszős utasítás-elválasztás)}
+
+\subsection{C++ (hivatkozások, RAII, smart pointerek, move semantics, monomorphization, memóriamodell)} 
+
+\subsection{ML Kit, Cyclone (régióalapú memóriakezelés}
+
+\subsection{Haskell (GHC)}: typeclasses, type families
+
+\subsection{Newsqueak, Alef, Limbo (csatornák, párhuzamosság)}
+
+\subsection{Erlang (üzenetküldés, thread failure}
+
+\subsection{Swift}: optional bindings
+A Swift nyelvben az optional binding segítségével ellenőrizhető, hogy egy optional tartalmaz-e értéket, ha igen, akkor az értéke felhasználható egy ideiglenes konstansként, vagy változóként, ekkor végrehajthatók tetszőleges feltételes utasítások. %(https://docs.swift.org/swift-book/LanguageGuide/TheBasics.html)
+\begin{lstlisting}[language=Swift]
+  if let constantName = someOptional {
+    statements
+  } else {
+    statements
+  }
+\end{lstlisting}
+Megjegyzés: az else ág akkor hajtódik végre, ha az opcionális változónak nincs értéke.
+
+Ez Rustban nagyon hasonló forráskóddal valósítható meg:
+\begin{lstlisting}[language=Rust, style=boxed, style=colouredRust]
+if let constantName = someOptional {
+  statements
+} else {
+  statements
+}
+\end{lstlisting}
+
+\subsection{Scheme (hygienic macros}
+
+\subsection{C\# (attribútumok)}
+
+Az attribútumok metaadatok megadására szolgálnak, amelyek a definiált típusról adhatnak.
+
+C\#-ban a következő módon adhatunk meg egy attribútumot:
+\begin{lstlisting}
+[Serializable]
+public class SampleClass
+{
+  //Object of this type can be serialized.
+}
+\end{lstlisting}
+Megjegyzés: ez az attribútum egy kívánt tulajdonságot rendel az osztályhoz.
+
+Rustban egy hasonló kód:
+\begin{lstlisting}[language=Rust, style=boxed]
+#[test]
+fn test_foo() {
+  /**%
+}
+\end{lstlisting}
+Megjegyzés: ez az attribútum megjelöli a test\_foo függvényt egységtesztként (unit test).
+
+\subsection{Unicode Annex \#31 (identifier és minta szintaxis)}
+
+\subsection{Korábbi hatások}
+A Rust nyelv 2006 óta többször megváltozott, vannak olyan nyelvek, melyek hatása korábban érvényesült a nyelvben, de azóta ezeket a megoldásokat részben, vagy teljesen átdolgozták, a korábbi hatás nem azonosítható. Ilyen a Ruby nyelv blokk-szintaxisa, valamint a NIL és Hermes nyelvekre jellemző typestate.
+
+Vannak olyan eset is, amikor egy nyelv jelentősebb hatással volt a Rustra, de néhány jellemző már megváltozott és mostanra már nem hasonlítanak az adott téren a nyelvek. Ide sorolható az Erlang linked thread failure és lightweight concurrency.
+
+\section{Támogatottsága}
+A Rust egy egyre népszerűbb, a GitHub felmérése szerint %(https://octoverse.github.com/projects.html, 2019.02.06)
+az ötödik leggyorsabban növekvő népszerűségű programozási nyelv a GitHubon tárolt kódokat tekintve.
+
+Egyre több területen láthatunk példákat a használatára "élesben" is: a Mozilla Firefox webböngésző Servo komponensén teljes átírásra került Rustban, ami a teljesítményen is látható javulást hozott. %citation needed
+, már (POSIX-kompatibilis) operációs rendszer (Redux OS), fájlrendszerek, beágyazott rendszerek, parancssoros eszközök (CLI tools), virtuális valóságot működtető szimulációs motorok létrehozására, webes keretrenszerek megvalósítására is találunk példákat. %Ide jó is lenne példákat hozni.
+A Mozillán kívül már népszerű Dropboxban és a Cloudflare szoftvereiben is találkozhatnánk Rust nyelven írt kóddal (természetesen csak elméletben, ezek zárt forráskódú szolgáltatások).
