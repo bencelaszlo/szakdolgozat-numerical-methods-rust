@@ -1,10 +1,12 @@
 \Chapter{Bevezetés}
 
 % 1-2 oldal
-Ezen dolgozat olyan numerikus problémák Rust programozási nyelven történő implementálásával, illeve azok teljesítményével foglalkozik, mint sorozatok rendezése, numerikus integrálás és interpoláció.
+A dolgozat olyan numerikus problémák Rust programozási nyelven történő implementálásával, illeve azok teljesítményével foglalkozik, mint sorozatok rendezése, numerikus integrálás és interpoláció.
 
 Kitér a relatíve fiatal Rust programozási nyelv tulajdonságaira, mint például az egyedi modellt megvalósító memóriakezelése, illetve a szabványos függvénykönyvtárbeli eszközeinek kiterjedtségére, nem utolsósorban pedig nyilvánvalóan a numerikus számításokhoz való felhasználhatósága kerül elemzésre.
 
-A numerikus számítások Rust nyelvű implementációja összehasonlításra kerül teljesítmény szempontjából (pontosabban futásidő és memóriahasználat terén) a közismertebb C nyelven írt implementációkkal. A mérések eredményeit grafikonok szemléltetik, amelyek mellett megtalálható a felhasznált forráskódok mindkét említett programozási nyelven, illetve az adott numerikus módszerek rövid, matematikai bevezetése.
+A numerikus számítások Rust nyelvű implementációja összehasonlításra kerül teljesítmény szempontjából (pontosabban futásidő és memóriahasználat terén) a közismertebb C nyelven írt implementációkkal. A mérések eredményeit minden esetben grafikonok szemléltetik, amelyek mellett megtalálható a felhasznált forráskódok mindkét említett programozási nyelven, illetve az adott numerikus módszerek rövid, matematikai bevezetése is.
 
-Végül pedig szó esik azokról a lehetséges aspektusokról, amelyek miatt egy implementáció jobb számítási teljesítményre lehet képes, mint egy másik. Legyenek ezek az adott programozási nyelv, vagy eszközeinek, esetleg a fordítónak adott paraméterek. 
+Végül pedig szó esik azokról a lehetséges aspektusokról, amelyek miatt egy implementáció jobb számítási teljesítményre lehet képes, mint egy másik. Legyenek ezek az adott programozási nyelv, vagy eszközeinek, esetleg a fordítónak adott paraméterek.
+
+A dolgozat végére kiderül, hogy a Rust programozási nyelv valóban képes a C programozási nyelven írt programokhoz hasonló, vagy esetenként teljesítmény elérésére, vagy sem a sajátosságaival együtt (azok miatt, vagy ha úgy tetszik: azok ellenére). Ahogyan az is, hogy mennyire célravezető a mérési eredmények, valamint a Rust szabványos függvénykönyvtára, illetve ökoszisztémája tekintetében a dolgozatban bemutatott módszerekhez hasonló problémák megoldására.
