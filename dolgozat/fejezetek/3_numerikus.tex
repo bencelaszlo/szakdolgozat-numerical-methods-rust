@@ -3,4 +3,9 @@
 % Numerical recipes
 
 \section{Mérési módszerek áttekintése}
+A futásidő, illetve a memóriahasználat méréshez a szabad szoftver GNU Time program került felhasználásra. A GNU Time parancs az \lstinline{-f} paraméterrel tetszőleges, formázott kimenetet ad. A mérésekhez jelen szakdolgozatban én tehát a következő módon használtam: \lstinline{time -f %E_%P_%M}, ahol az \lstinline{%E} az eltelt valós időt (óra:perc:másodperc formátumban), az \lstinline{%P} a job által ténylegesen felhasznált processzoridő arányát (beleértve a usermódban és kernelmódban felhasznált időt is) az eltelt időhöz (százalékos arány), az \lstinline{%M} pedig a processz életideje alatt felhasznált maximális memóriaméretet jelenti (kilobyte-okban).
+%https://www.gnu.org/software/time/
+
+A méréseket egy Intel i5-4200U processzorral és 8 GB memóriát használó számítógépen futtattam, 4.20.11-es verziószámú Linux-kernellel.
+
 \section{Tervek, észrevételek a mérésekhez}
