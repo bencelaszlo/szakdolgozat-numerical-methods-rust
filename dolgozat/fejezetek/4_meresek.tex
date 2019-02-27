@@ -12,8 +12,23 @@
 A trapézszabály határozott integrálok meghatározására alkalmas közelítő módszer, amely egy adott intervallumba eső függvénygörbe alatti területet a függvénygörbe (vég)pontjaira illesztett trapézzal közelíti. Azaz, ha a és b számok az intervallum végpontjai, akkor:
 \[ \int_{a}^{b} f(x) dx \approx (b-a) * \frac{f(a) + f(b)}{2} \]
 \subsubsection{C nyelvű referencia-implementáció}
-\begin{cppstyle}
-\end{cppstyle}
+\cppstyle{\begin{lstlisting}[language=c++]
+float trapedozial_rule(float a, float b, int n) {
+    float x;
+    float s;
+    float h;
+
+    h = (b-a) / n;
+    x = a;
+    b = 0.0;
+
+    for (int i = 0; i < n; i++) {
+        x += h;
+        s += parameter_function(x);
+    }
+    return 0.5 * (parameter_function(a) + 2.0 * s + parameter_function(b) );
+}
+\end{lstlisting}}
 \subsubsection{Az algoritmus egy implementációja Rustban}
 \begin{lstlisting}[language=Rust, style=boxed]
 fn trapedozial_rule(a: f32, b: f32, n: i32) -> f32 {
@@ -38,8 +53,28 @@ fn trapedozial_rule(a: f32, b: f32, n: i32) -> f32 {
 \subsubsection{Rövid matematikai bevezetés}
 Az iteratív trapézszabály a trapézszabályra épül. Lényege, hogy a függvénygörbe alatti területre illesztett trapézok számát iteratívan növeli, így minden iterációban egyre jobb közelítést ad. A számítógép implementációk esetén ez a finomítási folyamat akkor áll meg, amikor az elmúlt iterációban nem változott "sokat" a közelítés értéke.
 \subsubsection{C nyelvű referencia-implementáció}
-\begin{cppstyle}
-\end{cppstyle}
+\cppstyle{\begin{lstlisting}[language=c++]
+float q_trapedozial_rule(float a, float b) {
+    const int J_MAX = 20;
+    const float EPS = 0.00001;
+
+    float s = 0.0;
+    float olds;
+
+    olds = -0.00000000000000000000000000001;
+    for (int j = 0; j < J_MAX; j++) {
+        s = trapedozial_rule(a, b, j);
+        if (j < 5) {
+            if (abs(s-olds) < EPS * abs(olds) ) {
+                if ( (s == 0.0) && (olds == 0.0) ) {
+                    return s;
+                }
+            }
+        }
+    }
+    return s;
+}
+\end{lstlisting}}
 \subsubsection{Az algoritmus egy implementációja Rustban}
 \begin{lstlisting}[language=Rust]
 fn q_trapedozial_rule(a: f32, b: f32) -> f32 {
@@ -71,8 +106,33 @@ fn q_trapedozial_rule(a: f32, b: f32) -> f32 {
 \subsubsection{Rövid matematikai bevezetés}
 A Simpson-módszer a trapézszabályon alapul úgy, hogy a részintervallumok végpontjaihoz súlyokat rendel.Az iteratív Simpson-módszer a Simpson-módszerre alapul, az iteratív trapézszabályhoz hasonlóan finomítja egyre jobban a közelítést minden iterációban.
 \subsubsection{C nyelvű referencia-implementáció}
-\begin{cppstyle}
-\end{cppstyle}
+\cppstyle{\begin{lstlisting}[language=c++]
+float q_simpsons_rule(float a, float b) {
+    const int J_MAX = 20;
+    const float EPS = 0.00001;
+
+    float s = 0.0;
+    float st;
+    float ost;
+    float os;
+
+    os = -0.00000000000000000000000000001;
+    ost = os;
+
+    for (int j = 0; j < J_MAX; j++) {
+        st = trapedozial_rule(a, b, j);
+        s = (4.0 * st - ost) / 3.0;
+        if (j < 5) {
+            if (abs(s-os) < EPS * abs(os) || (s == 0.0 && os == 0.0) ) {
+                return s;
+            }
+        }
+        os = s;
+        ost = st;
+    }
+    return s;
+}
+\end{lstlisting}}
 \subsubsection{Az algoritmus egy implementációja Rustban}
 \begin{lstlisting}[language=Rust]
 fn q_simpsons_rule(a: f32, b: f32) -> f32 {
@@ -106,8 +166,30 @@ fn q_simpsons_rule(a: f32, b: f32) -> f32 {
 \subsection{Gauss-Legendre-módszer}
 \subsubsection{Rövid matematikai bevezetés}
 \subsubsection{C nyelvű referencia-implementáció}
-\begin{cppstyle}
-\end{cppstyle}
+\cppstyle{\begin{lstlisting}[language=c++]
+float q_gauss_legendre(float a, float b) {
+    float xr;
+    float xm;
+    float dx;
+    float s;
+
+    const float[6] X = [0.0, 0.1488743389, 0.4333953941, 0.6794095682, 0.8650633666,0.9739065285];
+    const float[6] Y = [0.0, 0.2955242247, 0.2692667193, 0.2190863625, 0.1494513491, 0.0666713443];
+
+    xm = 0.5 * (b + a);
+    xr = 0.5 * (b - a);
+
+    s = 0.0;
+
+    for (j = 0; j < 5; j++) {
+        dx = xr * X[j];
+        s += W[j] * parameter_function(xm + dx) + parameter_function(xm - dx);
+    }
+
+    float result = s * xr;
+    return result;
+}
+\end{lstlisting}}
 \subsubsection{Az algoritmus egy implementációja Rustban}
 \begin{lstlisting}[language=Rust]
 fn q_gauss_legendre(a: f32, b: f32) -> f32 {
@@ -140,8 +222,42 @@ fn q_gauss_legendre(a: f32, b: f32) -> f32 {
 \subsection{Kupac-rendezés}
 \subsubsection{Rövid matematikai bevezetés}
 \subsubsection{C nyelvű referencia-implementáció}
-\begin{cppstyle}
-\end{cppstyle}
+\cppstyle{\begin{lstlisting}[language=c++]
+void heapify(Vec *a, unsigned n, unsigned i) {
+    unsigned largest = i;
+    unsigned l = 2 * i + 1;
+    unsigned r = 2 * i + 2;
+
+    if ( (r < n) && (a->elements[i] < a->elements[l]) ) {
+        largest = l;
+    }
+
+    if ( (r < n) && (a->elements[largest] < a->elements[r]) ) {
+        largest = r;
+    }
+
+    if (largest != i) {
+        SWAP(float, a->elements[largest], a->elements[i]);
+
+        heapify(a, n, largest);
+    }
+}
+
+void heapsort(unsigned n, Vec *a) {
+    unsigned i = n;
+    while (i > 0) {
+        heapify(a, n, i);
+        i -= 1;
+    }
+
+    i = n - 1;
+    while (i > 0) {
+        SWAP(float, a->elements[0], a->elements[i]);
+        heapify(a, i ,0);
+        i -= 1;
+    }
+}
+\end{lstlisting}}
 \subsubsection{Az algoritmus egy implementációja Rustban}
 \begin{lstlisting}[language=Rust]
 fn heapify(a: &mut Vec<f32>, n: usize, i: usize) {
@@ -184,8 +300,27 @@ pub fn heapsort(n: usize, a: &mut Vec<f32>) {
 \subsection{Shell-rendezés}
 \subsubsection{Rövid matematikai bevezetés}
 \subsubsection{C nyelvű referencia-implementáció}
-\begin{cppstyle}
-\end{cppstyle}
+\cppstyle{\begin{lstlisting}[language=c++]
+void shell_sort(unsigned n, Vec *a) {
+    int gap = (n / 2);
+    float temp;
+    int j;
+
+    while (gap > 0) {
+        for (unsigned i = gap; i < n; i++) {
+            temp = a->elements[i];
+            
+            j = i;
+            while ( (j >= gap) && (a->elements[(j-gap)] > temp) ) {
+                a->elements[j] = a->elements[(j-gap)];
+                j -= gap;
+            }
+            a->elements[j] = temp;
+        }
+        gap /= 2;
+    }
+}
+\end{lstlisting}}
 \subsubsection{Az algoritmus egy implementációja Rustban}
 \begin{lstlisting}[language=Rust]
 pub fn shell_sort(n: i32, a: &mut Vec<f32>) {
@@ -213,8 +348,64 @@ pub fn shell_sort(n: i32, a: &mut Vec<f32>) {
 \subsection{Gyorsrendezés (Quicksort)}
 \subsubsection{Rövid matematikai bevezetés}
 \subsubsection{C nyelvű referencia-implementáció}
-\begin{cppstyle}
-\end{cppstyle}
+\cppstyle{\begin{lstlisting}[language=c++]
+int partition(int low, int high, Vec *arr) {
+    float pivot;
+
+    int mid = (low + high) / 2;
+    if (arr->elements[mid] < arr->elements[low]) {
+        SWAP(float, arr->elements[low], arr->elements[high]);
+    }
+
+    if (arr->elements[high] < arr->elements[low]) {
+        SWAP(float, arr->elements[low], arr->elements[high]);
+    }
+
+    if (arr->elements[mid] < arr->elements[high]) {
+        SWAP(float, arr->elements[mid], arr->elements[high]);
+    }
+
+    pivot = arr->elements[high];
+
+    int i;
+    int j;
+
+    i = low - 1;
+	j = high + 1;
+
+    while (1) {
+        while (1) {
+            i += 1;
+            if (arr->elements[i] >= pivot) {
+                break;
+            }
+        }
+
+        while (1) {
+            j -= 1;
+            if (arr->elements[j] <= pivot) {
+                break;
+            }
+        }
+
+        if (i >= j) {
+            return j;
+        }
+
+        SWAP(float, arr->elements[i], arr->elements[j]);
+    }
+}
+
+void quicksort(int low, int high, Vec *arr) {
+    if (low < high) {
+        int p = partition(low, high, arr);
+        quicksort(low, p, arr);
+        quicksort(p+1, high, arr);
+    } else {
+        return;
+    }
+}
+\end{lstlisting}}
 \subsubsection{Az algoritmus egy implementációja Rustban}
 \begin{lstlisting}[language=Rust]
 pub fn quicksort(low: i32, high: i32, arr: &mut Vec<f32>) {
@@ -281,8 +472,21 @@ A lineáris interpoláció két ismert pont közötti összefüggést egyenes ar
 \[ y_n = \frac{x_n - x_1}{x_2 - x_1} * (y_2 - y_1) + y_1 \]
 Ahol $x_1 \neq x_2$.
 \subsubsection{C nyelvű referencia-implementáció}
-\begin{cppstyle}
-\end{cppstyle}
+\cppstyle{\begin{lstlisting}[language=c++]
+float linear_interpolation(float x1, float y1, float x0, float y0, float x) {
+    float delta;
+    delta = x1 - x0;
+    float y;
+
+    if (delta == 0.0) {
+        y = y0;
+    } else {
+        y = y0 + ( (x - x0) / delta) * y1;
+    }
+
+    return y;
+}
+\end{lstlisting}}
 \subsubsection{Az algoritmus egy implementációja Rustban}
 \begin{lstlisting}[language=Rust]
 fn linear_interpolation(x1: f32, y1: f32, x0: f32, y0: f32, x: f32) -> f32 {
