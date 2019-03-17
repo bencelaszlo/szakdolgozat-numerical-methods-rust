@@ -1,10 +1,5 @@
 \Chapter{Mérések}
 
-% Külön szakaszokban bemutatni az egyes algoritmusokat
-% Szerkezete: rövid matematikai bevezetés, C implementáció ismertetése (referencia képpen), Rust implementáció, futtatások eredményei.
-% 5-8 módszer (szakasz)
-% Input méret függvényében az eredményeket grafikusan ábrázolni.
-
 \section{Numerikus integrálás}
 
 \subsection{Trapézszabály}
@@ -47,7 +42,7 @@ fn trapedozial_rule(a: f32, b: f32, n: i32) -> f32 {
 }
 \end{lstlisting}
 
-\subsubsection{Futtatások eredményei} % input méret függvényében eredmény grafika)
+\subsubsection{Futtatások eredményei}
 
 \subsection{Iteratív trapézszabály}
 \subsubsection{Rövid matematikai bevezetés}
@@ -100,7 +95,7 @@ fn q_trapedozial_rule(a: f32, b: f32) -> f32 {
 }
 \end{lstlisting}
 
-\subsubsection{Futtatások eredményei} % input méret függvényében eredmény grafika)
+\subsubsection{Futtatások eredményei}
 
 \subsection{Iteratív Simpson-módszer}
 \subsubsection{Rövid matematikai bevezetés}
@@ -161,7 +156,7 @@ fn q_simpsons_rule(a: f32, b: f32) -> f32 {
   return s;
 }
 \end{lstlisting}
-\subsubsection{Futtatások eredményei} % input méret függvényében eredmény grafika)
+\subsubsection{Futtatások eredményei}
 
 \subsection{Gauss-Legendre-módszer}
 \subsubsection{Rövid matematikai bevezetés}
@@ -215,7 +210,7 @@ fn q_gauss_legendre(a: f32, b: f32) -> f32 {
   return result;
 }  
 \end{lstlisting}
-\subsubsection{Futtatások eredményei} % input méret függvényében eredmény grafika)
+\subsubsection{Futtatások eredményei}
 
 \section{Rendezés}
 
@@ -352,7 +347,7 @@ pub fn shell_sort(n: i32, a: &mut Vec<f32>) {
 	}
 }
 \end{lstlisting}
-\subsubsection{Futtatások eredményei} % input méret függvényében eredmény grafika)
+\subsubsection{Futtatások eredményei}
 Shell-rendezés futási ideje
 
 \includegraphics[width=15.5cm]{kepek/shell_run.eps}
@@ -480,7 +475,7 @@ fn partition(low: i32, high: i32, arr: &mut Vec<f32>) -> i32 {
 	}
 }
 \end{lstlisting}
-\subsubsection{Futtatások eredményei} % input méret függvényében eredmény grafika)
+\subsubsection{Futtatások eredményei}
 Gyorsrendezés futási ideje
 
 \includegraphics[width=15.5cm]{kepek/quick_run.eps}
