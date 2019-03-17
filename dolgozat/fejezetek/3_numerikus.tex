@@ -6,6 +6,11 @@
 A futásidő, illetve a memóriahasználat méréshez a szabad szoftver GNU Time program került felhasználásra. A GNU Time parancs az \lstinline{-f} paraméterrel tetszőleges, formázott kimenetet ad. A mérésekhez jelen szakdolgozatban én tehát a következő módon használtam: \lstinline{time -f %E_%P_%M}, ahol az \lstinline{%E} az eltelt valós időt (óra:perc:másodperc formátumban), az \lstinline{%P} a job által ténylegesen felhasznált processzoridő arányát (beleértve a usermódban és kernelmódban felhasznált időt is) az eltelt időhöz (százalékos arány), az \lstinline{%M} pedig a processz életideje alatt felhasznált maximális memóriaméretet jelenti (kilobyte-okban).
 %https://www.gnu.org/software/time/
 
-A méréseket egy Intel i5-4200U processzorral és 8 GB memóriát használó számítógépen futtattam, 4.20.11-es verziószámú Linux-kernellel.
+A méréseket minden módszer estén, illetve megegyező méretű inputtal ugyanazokkal a véletlenszerűen generált számokkal végeztem mind a C, mind a Rust nyelvű implementációk esetén.
 
 \section{Tervek, észrevételek a mérésekhez}
+A méréseket egy Intel i5-4200U processzorral és 8 GB memóriát használó számítógépen futtattam, 4.20.11-es verziószámú Linux-kernellel. Az általam készített mérések kizárólag ezen az eszközön történtek, ugyanakkor az elkészült programok a forráskód szintjén portábilisek.
+
+A C nyelvű implementáció esetén a \lstinline{gcc} fordítóprogram az optimális, \lstinline{-O3} paraméterrel került meghívásra. A Rust nyelvű megoldás esetén pedig a \lstinline{rustc} fordítóprogram a Rust nyelvhez tartozó \lstinline{cargo} csomagkezelő \lstinline{build} paranccsa által hívódik meg. Az általam használt parancs pontosabban a \lstinline{cargo build --release}, amely alkalmazza a \lstinline{rustc} fordító által kínált legjobb hatásfokú optimalizálási megoldásokat, konkrétan az \lstinline{rustc -o} parancs kerül meghívásra (?), amely ekvivalens a (?)
+% https://www.mankier.com/1/cargo-build
+% https://www.mankier.com/1/rustc

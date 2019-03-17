@@ -295,7 +295,16 @@ pub fn heapsort(n: usize, a: &mut Vec<f32>) {
 	}
 }
 \end{lstlisting}
-\subsubsection{Futtatások eredményei} % input méret függvényében eredmény grafika)
+\subsubsection{Futtatások eredményei}
+Kupac-rendezés futási ideje
+
+\includegraphics[width=15.5cm]{kepek/heap_run.eps}
+Látható, hogy a kupac-rendezés módszerét tekintve a Rust nyelvű implementáció lassabb, mint a C-s megfelelője.
+
+Kupac-rendezés maximális memóriafoglalása
+
+\includegraphics[width=15.5cm]{kepek/heap_memory.eps}
+A Rust és C nyelven elkészített implementációk között a maximális memóriafoglalást tekintve nincsenek jelentős eltérések.
 
 \subsection{Shell-rendezés}
 \subsubsection{Rövid matematikai bevezetés}
@@ -344,6 +353,15 @@ pub fn shell_sort(n: i32, a: &mut Vec<f32>) {
 }
 \end{lstlisting}
 \subsubsection{Futtatások eredményei} % input méret függvényében eredmény grafika)
+Shell-rendezés futási ideje
+
+\includegraphics[width=15.5cm]{kepek/shell_run.eps}
+Látható, hogy a Shell-rendezés módszerét tekintve a Rust nyelvű implementáció lassabb, mint a C-s megfelelője.
+
+Shell-rendezés maximális memóriafoglalása
+
+\includegraphics[width=15.5cm]{kepek/shell_memory.eps}
+A Rust és C nyelven elkészített implementációk között a maximális memóriafoglalást tekintve nincsenek jelentős eltérések.
 
 \subsection{Gyorsrendezés (Quicksort)}
 \subsubsection{Rövid matematikai bevezetés}
@@ -463,6 +481,15 @@ fn partition(low: i32, high: i32, arr: &mut Vec<f32>) -> i32 {
 }
 \end{lstlisting}
 \subsubsection{Futtatások eredményei} % input méret függvényében eredmény grafika)
+Gyorsrendezés futási ideje
+
+\includegraphics[width=15.5cm]{kepek/quick_run.eps}
+Látható, hogy a gyorsrendezés módszerét tekintve a Rust nyelvű implementáció lassabb, mint a C-s megfelelője.
+
+Gyorsrendezés maximális memóriafoglalása
+
+\includegraphics[width=15.5cm]{kepek/quick_memory.eps}
+A Rust és C nyelven elkészített implementációk között a maximális memóriafoglalást tekintve nincsenek jelentős eltérések.
 
 \section{Interpoláció}
 
@@ -504,3 +531,12 @@ fn linear_interpolation(x1: f32, y1: f32, x0: f32, y0: f32, x: f32) -> f32 {
 }
 \end{lstlisting}
 \subsubsection{Futtatások eredményei}
+Lineáris interpoláció futási ideje
+
+\includegraphics[width=15.5cm]{kepek/linear_interpolation_memory.eps}
+Látható, hogy a lineáris interpoláció módszerét tekintve a Rust nyelvű implementáció lassabb, mint a C-s megfelelője.
+
+Lineáris interpoláció maximális memóriafoglalása
+
+\includegraphics[width=15.5cm]{kepek/linear_interpolation_memory.eps}
+A Rust és C nyelven elkészített implementációk között a maximális memóriafoglalást tekintve nincsenek jelentős eltérések.
