@@ -12,11 +12,11 @@ A C nyelvű implementációk fordításához a GNU GCC fordítóprogramot haszn�
   \item Az \lstinline{-O2} opció bekapcsolja közel az összes olyan támogatott optimalizálási megoldást, ami nem jár együtt kompromisszumokkal a tárigény és a futási idő között. Tovább növeli a teljesítményt, viszont a fordítási idő is növekedhet az opció használatával.
   \item Az \lstinline{-O3} opció használ minden optimalizálást, amit az \lstinline{-O2} opció is, és még néhányat azon felül.
   \item Az \lstinline{-Ofast} opció futási sebességre optimalizál, használ minden optimalizálást, amit az \lstinline{-O3} kapcsoló is, ezeken felül pedig olyan optimalizálásokat is engedélyez, amelyek nem érvények minden szabványos programnak.
-  \item Az \lstinline{-Os} opció a bináris méretére optimalizál. Használ minden optimalizálást, amit az \lstinline{-O2} opció is, kivéve azokat, amelyek sok esetben együtt járnak a tárigény növekedésével. Engedélyezni az \lstinline{-finline-funcions} kapcsolót, amely a fordítót a futási idő helyett a kódméret csökkentésére állítja. 
+  \item Az \lstinline{-Os} opció a bináris méretére optimalizál. Használ minden optimalizálást, amit az \lstinline{-O2} opció is, kivéve azokat, amelyek sok esetben együtt járnak a tárigény növekedésével. Engedélyezi az \lstinline{-finline-funcions} kapcsolót, amely a fordítót a futási idő helyett a kódméret csökkentésére állítja. 
 \end{itemize}
 % https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
 \subsection{A rustc fordítóprogram specifikus beállításai (Rust)}
 \begin{itemize}
-  \item A \lstinline{-C} vagy \lstinline{--codegen OPT[=VALUE]} opció használata esetén az \lstinline{opt-level} kapcsolóval állítható a fordító által alkalmazott optimalizálás szintje. A szint 0-3 közötti egész szám lehet, ahol a 3 jelenti a leginkább optimalizált kimenetet.
+  \item A \lstinline{-C} vagy \lstinline{--codegen OPT[=VALUE]} opció használata esetén az \lstinline{opt-level} kapcsolóval állítható a fordító által alkalmazott optimalizálás szintje. A szint egyrészt 0-3 közötti egész szám lehet, ahol a 3 jelenti a leginkább optimalizált kimenetet. Az \lstinline{s} és \lstinline{z} szintek a fordítás során létrejövő bináris méretére optimalizál.
   \item Az \lstinline{-O} opció ekvivalens a \lstinline{-C opt-level=2} használatával.
 \end{itemize}
