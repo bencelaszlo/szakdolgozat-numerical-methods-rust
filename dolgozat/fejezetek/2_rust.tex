@@ -8,9 +8,99 @@ Magához a Rust programozási nyelvhez mára több, mint 2000-ren járultak hozz
 
 \section{Jellemzői}
 %(https://web.archive.org/web/20170609052346/https://www.rust-lang.org/en-US/)
-A Rust egy rendszerprogramozási nyelv, melynek felépítése a memóriabiztonságot és a tread-safety-t garantáló párhuzamosságot helyezi előtérbe.
+%https://www.infoq.com/news/2012/08/Interview-Rust
+% Rust book ide vonatkozó fejezetei
+A Rust egy nyílt forráskódú%https://github.com/rust-lang/rust
+ rendszerprogramozási nyelv, melynek felépítése a memóriabiztonságot és a szálbiztonságot garantáló párhuzamosságot helyezi előtérbe.
+ 
+\subsection{Ownership-alapú memóriakezelés}
+Rustban más programozási nyelvekkel ellentétben a memóriakezelés nem támaszkodik a rendszerprogramozási nyelveknél megszokott manuális allokációra és felszabadításra, sem az objektum-orientált nyelvekre jellemző garbage collectoros megoldásra. A cél az egyedi, úgynevezett ownership-alapú memóriakezeléssel az, hogy a manuális memóriakezelés hatékonyságát a garbage collector egyszerű használatával ötvözze, az azokra jellemző negatívumok nélkül. Ezek a hátrányok manuális memóriakezelésnél a túl kései felszabadítás esetén a memóriaterület pazarlásához, túl korai felszabadítás esetén érvénytelen változókhoz vezetnek. Garbage collector használata esetén futásidőben kerülnek ellenőrzésre a memóriában tárolt értékekre mutató referenciák, és azok hiánya esetén a memóriaterület felszabadítására, ami programozói szempontból könnyebbséget, viszont erőforrás-használat szempontjából hátrányt jelent.
 
-zéróköltségű absztrakciók, move szemantikák, garantált memóriabiztonság, threads without data races, trait-alapú generikusok, mintaillesztés, típus-inference, minimális runtime, hatékony C bindings
+Az ownership koncepció gyakorlatilag azt jelenti, hogy fordításidőben ellenőrzi néhány szabály betartását, így futásidőben nem veti vissza a teljesítményt a már nem használt értékek keresésével. Emellett elfedi a stack és a heap memóriaterületek működését.
+
+\subsubsection{Az ownership szabályok}
+\begin{itemize}
+  \item minden érték tartozik egy változóhoz, amely változót az érték ownerének nevezünk
+  \item egy értéknek egyszerre csak egy ownere lehet
+  \item amikor az owner kikerül a scope-ból, az értéke eldobásra kerül
+\end{itemize}
+
+Egy változó a scope-ján belül érvényes, aztán automatikusan felszabadul az általa használt memóriaterület. Rustban a scope elhagyásakor a speciális \lstinline{drop} függvény hívódik meg, közvetlenül a scope végét jelző kapcsoszárójel (\lstinline{{}) után.
+
+A függvények a paramétereikként kapott változók felett átveszik az ownershipet, hasonlóképpen vissza is tudják adni, visszatérési értékként.
+
+Referenciák használatával az ownership átadása nélkül is átadhatunk hiivatkozást a memóriában tárolt értékekre, lényegében egy pointerként az adatokra mutató pointerre. Mivel az ownership nem kerül átadásra, így a drop függvény is csak magára a referenciára hívódik meg a scope végéével, a mutatott változó marad a memóriában. Az \lstinline{&} operátor az utána megadott változóra hoz létre hivatkozást, a \lstinline{*}, úgynevezett dereferencia-operátor pedig ennek fordított művelete.
+Referenciák használatával visszatérési értékre nincs szükség, hiszen az ownership mindvégig az eredeti ownerénél marad.
+
+A referenciák használatát függvényparaméterként borrowingnak hívjuk. Ilyen esetben nem változthatható meg a paraméterként kapott érték, ahhoz mutable reference-re van szükség, amelyet a \lstinline{mut &} operátorral lehetséges alkalmazni. Ezek használatához azonban a Rust biztonságos memóriahasználatának megvalósításához szükség van néhány korlátozásra: egy időben csak egyetlen mutable reference lehet egy adatra egy scope-ban, hogy a Rust fordításidőben el tudja kerülni a- data race-eket.
+
+Egy mutable és egy immutable referencia nem lehet egyidőben, hogy olvasáskor se léphessen fel inkonzisztencia. Mutable referencia nélkül természetesen bármennyi immutable referencia használata lehetséges.
+
+Dangling references / pointers
+A Rust garantálja, hogy felszabadított területre ne mutathasson referencia (dangling reference).
+%Átalakítani a példát
+\begin{lstlisting}[language=Rust, style=boxed]
+fn main() {
+  let emptiness = dangle();
+}
+
+fn dangle() => &String {
+  let s = String::from("Hello");
+  @s
+}
+\end{lstlisting}
+Ez a kódrészlet fordításidejű hibához vezet, mert az \lstinline{s} változó a \lstinline{Dangle} függvény végrehajtásánál eltűnik, mert véget ér a függvény scope-ja, ennek ellenére a kódrészlet megpróbálja visszaadni az \lstinline{s} változóra mutató referenciát, ami a scope-ból való kilépéssel már felszabadított memóriaterületre mutat.
+
+\subsubsection{A move művelet}
+Ha két változó ugyanarra az értékre mutat a memóriában, akkor a későbbi hivatkozás érvényteleníti a korábbi referenciát. Ilyen módon később nem jöhet létre dupla felszabadítási hiba (double free error), ami ugyanazon memóriaterület kétszeri felszabadítását jelenti. Ez a megoldás hasonlít más programozási nyelvekben megtalálható \textit{shallow copy} megoldásra, amellyel szemben Rustban különbség, hogy a shallow copy a pointer és a mutatott memóriaterület méretére vonatkozó adatok csak átmásolódnak az új változóba, a Rust viszont érvényteleníti is az ilyen módon "helyettesített" változót. Ennek a működésnek a következménye pedig, hogy a Rust automatikusan soha nem hoz létre \textit{deep copy}t sem (ami magát a mutatott adat másolását jelentené). Ellenben megegyező funkcionalitás elérhető a \lstinline{clone} metódus explicit hívásával: %Példa szükségeltetik ide
+\begin{lstlisting}[language=Rust, style=boxed]
+
+\end{lstlisting}
+
+\subsection{Mutability}
+Rustban alapértelmezés szerint minden változó immutable, azaz csak egyszer rendelhető hozzájuk érték. Ez egyszerűbbé teszi a többszálú programok fejlesztését, ugyanis így minden szál számára garantálható, hogy a változó értéke nem fog megváltozni. Nem keverendő össze a konstansokkal, amelyeket a \texttt{const} kulcsszó használatával deklarálhatunk Rustban a \texttt{let} helyett. Utóbbiak mindenképpen immutable változók (nem csak alapértelmezetten) és az értékadó utasításukban is csak konstans kifejezések szerepelhetnek, továbbá minden esetben el kell látni típus annotációval.
+% https://doc.rust-lang.org/book/ch03-01-variables-and-mutability.html
+
+Ha megpróbálnánk egy immutable változóhoz egynél többször is értéket adni, például:
+\begin{lstlisting}[language=Rust, style=boxed]
+let v = 0;
+v = 0;
+\end{lstlisting}
+Az fordításkor hibához vezet:
+\begin{verbatim}
+error[E0384]: cannot assign twice to immutable variable `v`
+\end{verbatim}
+
+Egy változó mutable-é tehető a \texttt{mut} kulcsszó használatával, az ilyen módon deklarált változónak többször is adhatunk értéket. Például az előző, hibás kódot a következő módon módosítva már lefordítja a fordító:
+\begin{lstlisting}[language=Rust, style=boxed]
+let mut v = 0;
+v = 0;
+\end{lstlisting}
+
+Egy másik megoldás ilyen esetekre a funckcionális nyelvekre %citation needed
+jellemző shadowing technika használata, vagyis egy korábban már deklarált változó "felülírása" egy azonos nevű, új változóval. Az előző példánál maradva:
+\begin{lstlisting}[language=Rust, style=boxed]
+let v = 0;
+let v = "0";
+\end{lstlisting}
+Mivel gyakorlatilag egy új változó jön létre, a példa megfelel a fordító ellenőrzésén annak ellenére, hogy más típusú. A shadowing technikával létrejött új változó is természetesen immutable lesz. Összetett adatszerkezetek esetén nem javasolt a használata az általa okozott teljesítmény-csökkenés miatt.
+
+\subsection{Statikus típusosság}
+A Rust egy statikusan típusos nyelv, tehát a változók típusának fordítási időben ki kell derülnie.
+
+zéróköltségű absztrakciók, garantált memóriabiztonság, threads without data races, mintaillesztés, típus-inference, minimális runtime, hatékony C bindings
+
+task based concurrency. a lightweight taskok párhuzamosan tudnak futni bármilyen adat megosztása nélkül
+
+higher-order functions (closures)
+
+\subsection{Trait-alapú generikusok}
+
+polimorfizmus, Java-szerű interfészek és Haskell-szerű típososztályok
+
+nincs buffer overflow
+
+"Modern nyelvi elemek": closures, traits, namespaces, destructors, Unicode, type infrence, disjoint unions.
 
 \section{Viszonya más programozási nyelvekkel}
 A Rust viszonylagos „fiatalsága” következtében több már meglévő programozási nyelv felépítéséből meríthetett. Ez a fejlesztői által is elismert %(https://doc.rust-lang.org/reference/influences.html)
@@ -82,8 +172,19 @@ Vannak olyan eset is, amikor egy nyelv jelentősebb hatással volt a Rustra, de 
 
 \section{Támogatottsága}
 A Rust egy egyre népszerűbb, a GitHub felmérése szerint %(https://octoverse.github.com/projects.html, 2019.02.06)
-az ötödik leggyorsabban növekvő népszerűségű programozási nyelv a GitHubon tárolt kódokat tekintve.
+az ötödik leggyorsabban növekvő népszerűségű programozási nyelv a GitHubon tárolt kódokat tekintve. A TIOBE-index szerint %https://www.tiobe.com/tiobe-index/
+2019. márciusában a 35. legnépszerűbb programozási nyelv.
 
-Egyre több területen láthatunk példákat a használatára "élesben" is: a Mozilla Firefox webböngésző Servo komponensén teljes átírásra került Rustban, ami a teljesítményen is látható javulást hozott. %citation needed
-, már (POSIX-kompatibilis) operációs rendszer (Redux OS), fájlrendszerek, beágyazott rendszerek, parancssoros eszközök (CLI tools), virtuális valóságot működtető szimulációs motorok létrehozására, webes keretrenszerek megvalósítására is találunk példákat. %Ide jó is lenne példákat hozni.
+Egyre több területen láthatunk példákat a használatára "élesben" is: a Mozilla Firefox webböngésző Servo komponensén teljes átírásra került Rustban
+%https://servo.org/
+, ami a teljesítményen is látható javulást hozott. %citation needed
+, már (POSIX-kompatibilis) operációs rendszer (Redux OS), fájlrendszerek, beágyazott rendszerek, parancssoros eszközök (CLI tools) %https://github.com/BurntSushi/ripgrep
+%https://github.com/sharkdp/fd
+%https://github.com/chmln/sd
+, virtuális valóságot működtető szimulációs motorok létrehozására, webes keretrenszerek megvalósítására is találunk példákat. %https://github.com/actix/actix-web
+játékprogramokhoz %%https://www.amethyst.rs/
+%https://www.piston.rs/
+Ezen kívül fejlesztés alatt áll Python-interpreter %(https://github.com/RustPython/RustPython),  
+keresztplatformos, GPU-gyorsított terminál emulátor: %https://github.com/jwilm/alacritty 
+
 A Mozillán kívül már népszerű Dropboxban és a Cloudflare szoftvereiben is találkozhatnánk Rust nyelven írt kóddal (természetesen csak elméletben, ezek zárt forráskódú szolgáltatások).
