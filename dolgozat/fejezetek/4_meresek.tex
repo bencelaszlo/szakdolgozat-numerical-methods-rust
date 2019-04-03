@@ -3,65 +3,79 @@
 \section{Numerikus integrálás}
 
 \subsection{Trapézszabály}
+
 \subsubsection{Rövid matematikai bevezetés}
-A trapézszabály határozott integrálok meghatározására alkalmas közelítő módszer, amely egy adott intervallumba eső függvénygörbe alatti területet a függvénygörbe (vég)pontjaira illesztett trapézzal közelíti. Azaz, ha a és b számok az intervallum végpontjai, akkor:
-\[ \int_{a}^{b} f(x) dx \approx (b-a) * \frac{f(a) + f(b)}{2} \]
+
+A trapézszabály határozott integrálok meghatározására alkalmas közelítő módszer, amely egy adott intervallumba eső függvénygörbe alatti területet a függvénygörbe (vég)pontjaira illesztett trapézzal közelíti. Azaz, ha $a$ és $b$ számok az intervallum végpontjai, akkor:
+\[
+\int_{a}^{b} \! f(x) \, \textrm{d} x \approx (b - a) \cdot \frac{f(a) + f(b)}{2}.
+\]
+
 \subsubsection{C nyelvű referencia-implementáció}
+
 \cppstyle{\begin{lstlisting}[language=c++]
 float trapedozial_rule(float a, float b, int n) {
     float x;
     float s;
     float h;
+    int i;
 
-    h = (b-a) / n;
+    h = (b - a) / n;
     x = a;
     b = 0.0;
 
-    for (int i = 0; i < n; i++) {
+    for (i = 0; i < n; i++) {
         x += h;
         s += parameter_function(x);
     }
-    return 0.5 * (parameter_function(a) + 2.0 * s + parameter_function(b) );
+    return 0.5 * (parameter_function(a) + 2.0 * s + parameter_function(b));
 }
 \end{lstlisting}}
+
 \subsubsection{Az algoritmus egy implementációja Rustban}
+
 \begin{lstlisting}[language=Rust, style=boxed]
 fn trapedozial_rule(a: f32, b: f32, n: i32) -> f32 {
   let mut _x: f32;
   let mut _s: f32;
   let h: f32;
   
-  h = (b-a) / (n as f32);
+  h = (b - a) / (n as f32);
   _x = a;
   _s = 0.0;
   for _i in 1..n {
-	  _x += h;
-	  _s += parameter_function(_x);
+      _x += h;
+      _s += parameter_function(_x);
   }
-  return 0.5 * (parameter_function(a) + 2.0 * _s + parameter_function(b) );
+  return 0.5 * (parameter_function(a) + 2.0 * _s + parameter_function(b));
 }
 \end{lstlisting}
 
 \subsubsection{Futtatások eredményei}
 
 \subsection{Iteratív trapézszabály}
+
 \subsubsection{Rövid matematikai bevezetés}
+
 Az iteratív trapézszabály a trapézszabályra épül. Lényege, hogy a függvénygörbe alatti területre illesztett trapézok számát iteratívan növeli, így minden iterációban egyre jobb közelítést ad. A számítógép implementációk esetén ez a finomítási folyamat akkor áll meg, amikor az elmúlt iterációban nem változott "sokat" a közelítés értéke.
+
 \subsubsection{C nyelvű referencia-implementáció}
+
 \cppstyle{\begin{lstlisting}[language=c++]
 float q_trapedozial_rule(float a, float b) {
     const int J_MAX = 20;
     const float EPS = 0.00001;
 
     float s = 0.0;
-    float olds;
+    float olds = -1e-30;
+    
+    int j;
 
-    olds = -0.00000000000000000000000000001;
-    for (int j = 0; j < J_MAX; j++) {
+    for (j = 0; j < J_MAX; j++) {
         s = trapedozial_rule(a, b, j);
         if (j < 5) {
-            if (abs(s-olds) < EPS * abs(olds) ) {
-                if ( (s == 0.0) && (olds == 0.0) ) {
+            if (abs(s - olds) < EPS * abs(olds)) {
+                if ( (s == 0.0) && (olds == 0.0)) {
                     return s;
                 }
             }
@@ -79,12 +93,12 @@ fn q_trapedozial_rule(a: f32, b: f32) -> f32 {
   let mut s: f32 = 0.0;
   let olds: f32;
   
-  olds = -0.00000000000000000000000000001;
+  olds = -1e-30;
   println!("{}", olds);
   for j in 0..J_MAX {
 	  s = trapedozial_rule(a, b, j);
 	  if j > 5 {
-		  if (s-olds).abs() < EPS * olds.abs() {
+		  if (s - olds).abs() < EPS * olds.abs() {
 			  if s == 0.0 && olds == 0.0 {
 				  return s;
 			  }
@@ -96,11 +110,17 @@ fn q_trapedozial_rule(a: f32, b: f32) -> f32 {
 \end{lstlisting}
 
 \subsubsection{Futtatások eredményei}
+
 \includegraphics[width=15.5cm]{kepek/trapedozial_run.eps}
+
 \subsection{Iteratív Simpson-módszer}
+
 \subsubsection{Rövid matematikai bevezetés}
-A Simpson-módszer a trapézszabályon alapul úgy, hogy a részintervallumok végpontjaihoz súlyokat rendel.Az iteratív Simpson-módszer a Simpson-módszerre alapul, az iteratív trapézszabályhoz hasonlóan finomítja egyre jobban a közelítést minden iterációban.
+
+A Simpson-módszer a trapézszabályon alapul úgy, hogy a részintervallumok végpontjaihoz súlyokat rendel. Az iteratív Simpson-módszer a Simpson-módszerre alapul, az iteratív trapézszabályhoz hasonlóan finomítja egyre jobban a közelítést minden iterációban.
+
 \subsubsection{C nyelvű referencia-implementáció}
+
 \cppstyle{\begin{lstlisting}[language=c++]
 float q_simpsons_rule(float a, float b) {
     const int J_MAX = 20;
@@ -110,15 +130,16 @@ float q_simpsons_rule(float a, float b) {
     float st;
     float ost;
     float os;
+    int j;
 
-    os = -0.00000000000000000000000000001;
+    os = -1e-30;
     ost = os;
 
-    for (int j = 0; j < J_MAX; j++) {
+    for (j = 0; j < J_MAX; j++) {
         st = trapedozial_rule(a, b, j);
         s = (4.0 * st - ost) / 3.0;
         if (j < 5) {
-            if (abs(s-os) < EPS * abs(os) || (s == 0.0 && os == 0.0) ) {
+            if (abs(s - os) < EPS * abs(os) || (s == 0.0 && os == 0.0) ) {
                 return s;
             }
         }
@@ -139,7 +160,7 @@ fn q_simpsons_rule(a: f32, b: f32) -> f32 {
   let mut ost: f32;
   let mut os: f32;
   
-  os = -0.00000000000000000000000000001;
+  os = -1e-30;
   ost = os;
   
   for j in 0..J_MAX {
@@ -177,6 +198,8 @@ float q_gauss_legendre(float a, float b) {
     xr = 0.5 * (b - a);
 
     s = 0.0;
+    
+    int j;
 
     for (j = 0; j < 5; j++) {
         dx = xr * X[j];
@@ -214,30 +237,35 @@ fn q_gauss_legendre(a: f32, b: f32) -> f32 {
   return result;
 }  
 \end{lstlisting}
+
 \subsubsection{Futtatások eredményei}
 
 \section{Rendezés}
 
 \subsection{Kupac-rendezés}
+
 \subsubsection{Rövid matematikai bevezetés}
+
 \subsubsection{C nyelvű referencia-implementáció}
+
+% TODO: A Vec-et, mint típust részletezni!
+
 \cppstyle{\begin{lstlisting}[language=c++]
 void heapify(Vec *a, unsigned n, unsigned i) {
     unsigned largest = i;
     unsigned l = 2 * i + 1;
     unsigned r = 2 * i + 2;
 
-    if ( (r < n) && (a->elements[i] < a->elements[l]) ) {
+    if ((r < n) && (a->elements[i] < a->elements[l])) {
         largest = l;
     }
 
-    if ( (r < n) && (a->elements[largest] < a->elements[r]) ) {
+    if ((r < n) && (a->elements[largest] < a->elements[r]) ) {
         largest = r;
     }
 
     if (largest != i) {
         SWAP(float, a->elements[largest], a->elements[i]);
-
         heapify(a, n, largest);
     }
 }
@@ -312,14 +340,15 @@ A Rust és C nyelven elkészített implementációk között a maximális memór
 void shell_sort(unsigned n, Vec *a) {
     int gap = (n / 2);
     float temp;
+    unsigned int i;
     int j;
 
     while (gap > 0) {
-        for (unsigned i = gap; i < n; i++) {
+        for (i = gap; i < n; i++) {
             temp = a->elements[i];
             
             j = i;
-            while ( (j >= gap) && (a->elements[(j-gap)] > temp) ) {
+            while ((j >= gap) && (a->elements[(j-gap)] > temp) ) {
                 a->elements[j] = a->elements[(j-gap)];
                 j -= gap;
             }
