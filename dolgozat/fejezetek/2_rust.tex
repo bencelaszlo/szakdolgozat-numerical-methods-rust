@@ -1,50 +1,62 @@
 \Chapter{A Rust programozási nyelv}
 
 \section{Története, kialakulása}
-A Rust programozási nyelv története 2006-ban kezdődött, Graydon Hoare személyes projektjeként. A Mozilla Alapítvány (Mozilla Organization) 2009-ben csatlakozott a projekthez, amikorra a nyelv már képes volt alapvető tulajdonságainak bemutatására. %(https://web.archive.org/web/20160305231140/https://www.rust-lang.org/faq.html)
 
-A Rust továbbra is a Mozilla támogatását élvezi, de nem áll a Mozilla irányítása alatt. A projekt irányítását egy több vezető fejlesztő által alkotott csapat végzi %(https://github.com/rust-lang/rust-wiki-backup/blob/master/Note-core-team.md).
-Magához a Rust programozási nyelvhez mára több, mint 2000-ren járultak hozzá. %(https://github.com/rust-lang/rust/graphs/contributors)
+A Rust programozási nyelv története 2006-ban kezdődött, Graydon Hoare személyes projektjeként. A Mozilla Alapítvány (Mozilla Organization) 2009-ben csatlakozott a projekthez, amikorra már kezdtek kialakulni a nyelv jellegzetességei.
+
+%(https://web.archive.org/web/20160305231140/https://www.rust-lang.org/faq.html)
+
+A Rust továbbra is a Mozilla támogatását élvezi, de nem áll a Mozilla irányítása alatt. A projekt irányítását egy több vezető fejlesztő által alkotott csapat végzi
+
+%(https://github.com/rust-lang/rust-wiki-backup/blob/master/Note-core-team.md).
+
+Magához a Rust programozási nyelvhez mára több, mint 2000-ren járultak hozzá.
+
+%(https://github.com/rust-lang/rust/graphs/contributors)
 
 \section{Jellemzői}
+
 %(https://web.archive.org/web/20170609052346/https://www.rust-lang.org/en-US/)
 %https://www.infoq.com/news/2012/08/Interview-Rust
 % Rust book ide vonatkozó fejezetei
-A Rust egy nyílt forráskódú%https://github.com/rust-lang/rust
- rendszerprogramozási nyelv, melynek felépítése a memóriabiztonságot és a szálbiztonságot garantáló párhuzamosságot helyezi előtérbe.
+%https://github.com/rust-lang/rust
+A Rust egy nyílt forráskódú rendszerprogramozási nyelv, melynek felépítése a memóriabiztonságot és a szálbiztonságot garantáló párhuzamosságot helyezi előtérbe. A következő szakaszokban ezek megjelenési módját tekintjük át.
  
 \subsection{Ownership-alapú memóriakezelés}
-Rustban más programozási nyelvekkel ellentétben a memóriakezelés nem támaszkodik a rendszerprogramozási nyelveknél megszokott manuális allokációra és felszabadításra, sem az objektum-orientált nyelvekre jellemző garbage collectoros megoldásra. A cél az egyedi, úgynevezett ownership-alapú memóriakezeléssel az, hogy a manuális memóriakezelés hatékonyságát a garbage collector egyszerű használatával ötvözze, az azokra jellemző negatívumok nélkül. Ezek a hátrányok manuális memóriakezelésnél a túl kései felszabadítás esetén a memóriaterület pazarlásához, túl korai felszabadítás esetén érvénytelen változókhoz vezetnek. Garbage collector használata esetén futásidőben kerülnek ellenőrzésre a memóriában tárolt értékekre mutató referenciák, és azok hiánya esetén a memóriaterület felszabadítására, ami programozói szempontból könnyebbséget, viszont erőforrás-használat szempontjából hátrányt jelent.
 
-Az ownership koncepció gyakorlatilag azt jelenti, hogy fordításidőben ellenőrzi néhány szabály betartását, így futásidőben nem veti vissza a teljesítményt a már nem használt értékek keresésével. Emellett elfedi a stack és a heap memóriaterületek működését.
+Rustban más programozási nyelvekkel ellentétben a memóriakezelés nem támaszkodik a rendszerprogramozási nyelveknél megszokott manuális allokációra és felszabadításra, sem az objektum-orientált nyelvekre jellemző szemétgyűjtő (\textit{garbage collection}) mechanizmusokra. A cél az egyedi, úgynevezett ownership-alapú memóriakezeléssel az, hogy a manuális memóriakezelés hatékonyságát a garbage collector egyszerű használatával ötvözze, az azokra jellemző negatívumok nélkül. Ezek a hátrányok manuális memóriakezelésnél a túl kései felszabadítás esetén a memóriaterület pazarlásához, túl korai felszabadítás esetén érvénytelen változókhoz vezetnek. Garbage collector használata esetén futásidőben kerülnek ellenőrzésre a memóriában tárolt értékekre mutató referenciák, és azok hiánya esetén a memóriaterület felszabadítására, ami programozói szempontból könnyebbséget, viszont erőforrás-használat szempontjából nehezen kiszámíthatóságot jelent.
+
+Az ownership koncepció gyakorlatilag azt jelenti, hogy a fordító fordítási időben ellenőrzi néhány szabály betartását, így futásidőben nem veti vissza a teljesítményt a már nem használt értékek keresésével. Emellett elfedi a stack és a heap memóriaterületek működését.
 
 \subsubsection{Az ownership szabályok}
+
+Az \textit{ownership} a memóriaterületek kezelését minden esetben tulajdonoshoz köti. Ez konkrétan a következő szabályok betartását jelenti.
 \begin{itemize}
-  \item minden érték tartozik egy változóhoz, amely változót az érték ownerének nevezünk
-  \item egy értéknek egyszerre csak egy ownere lehet
-  \item amikor az owner kikerül a scope-ból, az értéke eldobásra kerül
+  \item Minden érték tartozik egy változóhoz, amely változót az érték tulajdonosának (\textit{ownerének}) nevezünk.
+  \item Egy értéknek egyszerre csak egy tulajdonosa lehet.
+  \item Amikor a tulajdonos kikerül a hatókörből, a hozzá tartozó értékek eldobásra kerülnek.
 \end{itemize}
 
-Egy változó a scope-ján belül érvényes, aztán automatikusan felszabadul az általa használt memóriaterület. Rustban a scope elhagyásakor a speciális \lstinline{drop} függvény hívódik meg, közvetlenül a scope végét jelző kapcsoszárójel (\lstinline{{}) után.
+Egy változó a hatókörén belül érvényes, aztán automatikusan felszabadul az általa használt memóriaterület. Rustban a hatókör elhagyásakor a speciális \lstinline{drop} függvény hívódik meg, közvetlenül a scope végét jelző kapcsoszárójel (\lstinline{{}) után.
 
 A függvények a paramétereikként kapott változók felett átveszik az ownershipet, hasonlóképpen vissza is tudják adni, visszatérési értékként.
 
-Referenciák használatával az ownership átadása nélkül is átadhatunk hiivatkozást a memóriában tárolt értékekre, lényegében egy pointerként az adatokra mutató pointerre. Mivel az ownership nem kerül átadásra, így a drop függvény is csak magára a referenciára hívódik meg a scope végéével, a mutatott változó marad a memóriában. Az \lstinline{&} operátor az utána megadott változóra hoz létre hivatkozást, a \lstinline{*}, úgynevezett dereferencia-operátor pedig ennek fordított művelete.
+Referenciák használatával az ownership átadása nélkül is átadhatunk értékeket, lényegében egy mutatóval hivatkozva be azokat. Mivel az ownership nem kerül átadásra, így a \lstinline{drop} függvény is csak magára a referenciára hívódik meg a hatókör végén, a mutatott változó marad a memóriában. Az \lstinline{&} operátor az utána megadott változóra hoz létre hivatkozást, a \lstinline{*}, úgynevezett dereferencia-operátor pedig ennek fordított művelete.
 Referenciák használatával visszatérési értékre nincs szükség, hiszen az ownership mindvégig az eredeti ownerénél marad.
 
-A referenciák használatát függvényparaméterként borrowingnak hívjuk. Ilyen esetben nem változthatható meg a paraméterként kapott érték, ahhoz mutable reference-re van szükség, amelyet a \lstinline{mut &} operátorral lehetséges alkalmazni. Ezek használatához azonban a Rust biztonságos memóriahasználatának megvalósításához szükség van néhány korlátozásra: egy időben csak egyetlen mutable reference lehet egy adatra egy scope-ban, hogy a Rust fordításidőben el tudja kerülni a- data race-eket.
+A referenciák használatát függvényparaméterként borrowingnak (tükörfordításban \textit{kölcsönzésnek}) hívjuk. Ilyen esetben nem változtatható meg a paraméterként kapott érték, ahhoz módosítható referenciára (\textit{mutable reference}-re) van szükség, amelyet a \lstinline{mut &} operátorral lehetséges alkalmazni. Ezek használatához azonban a Rust biztonságos memóriahasználatának megvalósításához szükség van néhány korlátozásra: egy időben csak egyetlen mutable reference lehet egy adatra egy scope-ban, azért hogy a Rust fordítási időben el tudja kerülni az egyidejű hozzáférésből eredő problémákat.
 
 Egy mutable és egy immutable referencia nem lehet egyidőben, hogy olvasáskor se léphessen fel inkonzisztencia. Mutable referencia nélkül természetesen bármennyi immutable referencia használata lehetséges.
 
-Dangling references / pointers
-A Rust garantálja, hogy felszabadított területre ne mutathasson referencia (dangling reference).
+% Dangling references / pointers
+A Rust garantálja, hogy felszabadított területre ne mutathasson referencia (\textit{dangling reference}).
 %Átalakítani a példát
 \begin{lstlisting}[language=Rust, style=boxed]
 fn main() {
   let emptiness = dangle();
 }
 
-fn dangle() => &String {
+fn dangle() -> &String {
   let s = String::from("Hello");
   @s
 }
@@ -52,40 +64,43 @@ fn dangle() => &String {
 Ez a kódrészlet fordításidejű hibához vezet, mert az \lstinline{s} változó a \lstinline{Dangle} függvény végrehajtásánál eltűnik, mert véget ér a függvény scope-ja, ennek ellenére a kódrészlet megpróbálja visszaadni az \lstinline{s} változóra mutató referenciát, ami a scope-ból való kilépéssel már felszabadított memóriaterületre mutat.
 
 \subsubsection{A move művelet}
-Ha két változó ugyanarra az értékre mutat a memóriában, akkor a későbbi hivatkozás érvényteleníti a korábbi referenciát. Ilyen módon később nem jöhet létre dupla felszabadítási hiba (double free error), ami ugyanazon memóriaterület kétszeri felszabadítását jelenti. Ez a megoldás hasonlít más programozási nyelvekben megtalálható \textit{shallow copy} megoldásra, amellyel szemben Rustban különbség, hogy a shallow copy a pointer és a mutatott memóriaterület méretére vonatkozó adatok csak átmásolódnak az új változóba, a Rust viszont érvényteleníti is az ilyen módon "helyettesített" változót. Ennek a működésnek a következménye pedig, hogy a Rust automatikusan soha nem hoz létre \textit{deep copy}t sem (ami magát a mutatott adat másolását jelentené). Ellenben megegyező funkcionalitás elérhető a \lstinline{clone} metódus explicit hívásával: %Példa szükségeltetik ide
+
+Ha két változó ugyanarra az értékre mutat a memóriában, akkor a későbbi hivatkozás érvényteleníti a korábbi referenciát. Ilyen módon később nem jöhet létre dupla felszabadítási hiba (\textit{double free error}), ami ugyanazon memóriaterület kétszeri felszabadítását jelenti. Ez a megoldás hasonlít más programozási nyelvekben megtalálható \textit{shallow copy} megoldásra, amellyel szemben Rustban különbség, hogy a shallow copy a pointer és a mutatott memóriaterület méretére vonatkozó adatok csak átmásolódnak az új változóba, a Rust viszont érvényteleníti is az ilyen módon "helyettesített" változót. Ennek a működésnek a következménye pedig, hogy a Rust automatikusan soha nem hoz létre \textit{deep copy}t sem (ami magát a mutatott adat másolását jelentené). Ellenben megegyező funkcionalitás elérhető a \lstinline{clone} metódus explicit hívásával:
+
+% TODO: Példa szükségeltetik ide
 \begin{lstlisting}[language=Rust, style=boxed]
 
 \end{lstlisting}
 
 \subsection{Mutability}
-Rustban alapértelmezés szerint minden változó immutable, azaz csak egyszer rendelhető hozzájuk érték. Ez egyszerűbbé teszi a többszálú programok fejlesztését, ugyanis így minden szál számára garantálható, hogy a változó értéke nem fog megváltozni. Nem keverendő össze a konstansokkal, amelyeket a \texttt{const} kulcsszó használatával deklarálhatunk Rustban a \texttt{let} helyett. Utóbbiak mindenképpen immutable változók (nem csak alapértelmezetten) és az értékadó utasításukban is csak konstans kifejezések szerepelhetnek, továbbá minden esetben el kell látni típus annotációval.
+Rustban alapértelmezés szerint minden változó immutable, azaz csak egyszer rendelhető hozzájuk érték. Ez egyszerűbbé teszi a többszálú programok fejlesztését, ugyanis így minden szál számára garantálható, hogy a változó értéke nem fog megváltozni. Nem keverendő össze a konstansokkal, amelyeket a \texttt{const} kulcsszó használatával deklarálhatunk Rustban a \texttt{let} helyett. Utóbbiak mindenképpen immutable változók (nem csak alapértelmezetten) és az értékadó utasításukban is csak konstans kifejezések szerepelhetnek, továbbá minden esetben el kell látni típus annotációval őket.
 % https://doc.rust-lang.org/book/ch03-01-variables-and-mutability.html
-
 Ha megpróbálnánk egy immutable változóhoz egynél többször is értéket adni, például:
 \begin{lstlisting}[language=Rust, style=boxed]
 let v = 0;
 v = 0;
 \end{lstlisting}
-Az fordításkor hibához vezet:
+az az alábbi fordítási hibához vezet:
 \begin{verbatim}
 error[E0384]: cannot assign twice to immutable variable `v`
 \end{verbatim}
-
 Egy változó mutable-é tehető a \texttt{mut} kulcsszó használatával, az ilyen módon deklarált változónak többször is adhatunk értéket. Például az előző, hibás kódot a következő módon módosítva már lefordítja a fordító:
 \begin{lstlisting}[language=Rust, style=boxed]
 let mut v = 0;
 v = 0;
 \end{lstlisting}
-
 Egy másik megoldás ilyen esetekre a funckcionális nyelvekre %citation needed
-jellemző shadowing technika használata, vagyis egy korábban már deklarált változó "felülírása" egy azonos nevű, új változóval. Az előző példánál maradva:
+jellemző \textit{shadowing} technika használata, vagyis egy korábban már deklarált változó "felülírása" egy azonos nevű, új változóval. Az előző példánál maradva:
 \begin{lstlisting}[language=Rust, style=boxed]
 let v = 0;
 let v = "0";
 \end{lstlisting}
 Mivel gyakorlatilag egy új változó jön létre, a példa megfelel a fordító ellenőrzésén annak ellenére, hogy más típusú. A shadowing technikával létrejött új változó is természetesen immutable lesz. Összetett adatszerkezetek esetén nem javasolt a használata az általa okozott teljesítmény-csökkenés miatt.
 
+% TODO: A fejezet további részét még rendbe kell szedni!
+
 \subsection{Statikus típusosság}
+
 A Rust egy statikusan típusos nyelv, tehát a változók típusának fordítási időben ki kell derülnie.
 
 zéróköltségű absztrakciók, garantált memóriabiztonság, threads without data races, mintaillesztés, típus-inference, minimális runtime, hatékony C bindings

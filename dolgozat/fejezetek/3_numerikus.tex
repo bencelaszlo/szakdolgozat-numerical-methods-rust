@@ -3,15 +3,19 @@
 % Numerical recipes
 
 \section{Mérési módszerek áttekintése}
-A futásidő, illetve a memóriahasználat méréshez a szabad szoftver GNU Time program került felhasználásra. A GNU Time parancs az \lstinline{-f} paraméterrel tetszőleges, formázott kimenetet ad. A mérésekhez jelen szakdolgozatban én tehát a következő módon használtam: \lstinline{time -f %E_%P_%M}, ahol az \lstinline{%E} az eltelt valós időt (óra:perc:másodperc formátumban), az \lstinline{%P} a job által ténylegesen felhasznált processzoridő arányát (beleértve a usermódban és kernelmódban felhasznált időt is) az eltelt időhöz (százalékos arány), az \lstinline{%M} pedig a processz életideje alatt felhasznált maximális memóriaméretet jelenti (kilobyte-okban).
+
+A futási idő, illetve a memóriahasználat méréséhez a szabad szoftver GNU Time program került felhasználásra. A GNU Time parancs az \lstinline{-f} paraméterrel tetszőleges, formázott kimenetet ad. A mérésekhez a szakdolgozatban a következő módon használtam: \lstinline{time -f %E_%P_%M}, ahol az \lstinline{%E} az eltelt valós időt (óra:perc:másodperc formátumban), a \lstinline{%P} a program (\textit{job}) által ténylegesen felhasznált processzoridő arányát (beleértve a felhasználói módban és a kernel módban felhasznált időt is) az eltelt időhöz (százalékos arányban), az \lstinline{%M} pedig a processz életideje alatt felhasznált maximális memóriaméretet jelenti (kilobyte-okban).
 %https://www.gnu.org/software/time/
 
-A méréseket minden módszer estén, illetve megegyező méretű inputtal ugyanazokkal a véletlenszerűen generált lebegőpontos számokkal végeztem mind a C, mind a Rust nyelvű implementációk esetén.
+A méréseket minden módszer esetén megegyező méretű bemenettel, illetve ugyanazokkal a véletlenszerűen generált lebegőpontos számokkal végeztem mind a C, mind a Rust nyelvű implementációk esetén.
 
 \section{Tervek, észrevételek a mérésekhez}
+
 A méréseket egy Intel i5-4200U processzorral és 8 GB memóriát használó számítógépen futtattam, 4.20.11-es verziószámú Linux-kernellel. Az általam készített mérések kizárólag ezen az eszközön történtek, ugyanakkor az elkészült programok a forráskód szintjén portábilisek.
 
-A C nyelvű implementáció esetén a \lstinline{gcc} fordítóprogram az optimális, \lstinline{-O3} paraméterrel került meghívásra. A Rust nyelvű megoldás esetén pedig a \lstinline{rustc} fordítóprogram a Rust nyelvhez tartozó \lstinline{cargo} csomagkezelő \lstinline{build} paranccsa által hívódik meg. Az általam használt parancs pontosabban a \lstinline{cargo build --release}, amely alkalmazza a \lstinline{rustc} fordító által kínált legjobb hatásfokú optimalizálási megoldásokat, konkrétan az \lstinline{rustc -C --opt-level=3} parancs kerül meghívásra.
+% TODO: Pontos Rust és C verziók kellenek majd még.
+
+A C nyelvű implementáció esetén a \lstinline{gcc} fordítóprogram az optimális, \lstinline{-O3} paraméterrel került meghívásra. A Rust nyelvű megoldás esetén pedig a \lstinline{rustc} fordítóprogram a Rust nyelvhez tartozó \lstinline{cargo} csomagkezelő \lstinline{build} paranccsa által hívódik meg. Az általam használt parancs a \lstinline{cargo build --release}, amely alkalmazza a \lstinline{rustc} fordító által kínált legjobb hatásfokú optimalizálási megoldásokat, konkrétan az \lstinline{rustc -C --opt-level=3} parancs kerül meghívásra.
 % https://www.mankier.com/1/cargo-build
 % https://www.mankier.com/1/rustc
 %https://doc.rust-lang.org/cargo/reference/manifest.html#the-profile-sections
