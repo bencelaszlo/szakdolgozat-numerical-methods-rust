@@ -142,7 +142,7 @@ A Swift nyelvben az optional binding segítségével ellenőrizhető, hogy egy o
     statements
   }
 \end{lstlisting}
-Megjegyzés: az else ág akkor hajtódik végre, ha az opcionális változónak nincs értéke.
+Megjegyzés: az else ág akkor hajtódik végre, ha az opcionális változónak nincs értéke. Az összes ágban lévő érték típusának meg kell egyeznie.
 
 Ez Rustban nagyon hasonló forráskóddal valósítható meg:
 \begin{lstlisting}[language=Rust, style=boxed, style=colouredRust]
@@ -179,6 +179,7 @@ fn test_foo() {
 Megjegyzés: ez az attribútum megjelöli a test\_foo függvényt egységtesztként (unit test).
 
 \subsection{Unicode Annex \#31 (identifier és minta szintaxis)}
+%http://www.unicode.org/reports/tr31/
 
 \subsection{Korábbi hatások}
 A Rust nyelv 2006 óta többször megváltozott, vannak olyan nyelvek, melyek hatása korábban érvényesült a nyelvben, de azóta ezeket a megoldásokat részben, vagy teljesen átdolgozták, a korábbi hatás nem azonosítható. Ilyen a Ruby nyelv blokk-szintaxisa, valamint a NIL és Hermes nyelvekre jellemző typestate.

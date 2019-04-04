@@ -7,13 +7,16 @@
 A futási idő, illetve a memóriahasználat méréséhez a szabad szoftver GNU Time program került felhasználásra. A GNU Time parancs az \lstinline{-f} paraméterrel tetszőleges, formázott kimenetet ad. A mérésekhez a szakdolgozatban a következő módon használtam: \lstinline{time -f %E_%P_%M}, ahol az \lstinline{%E} az eltelt valós időt (óra:perc:másodperc formátumban), a \lstinline{%P} a program (\textit{job}) által ténylegesen felhasznált processzoridő arányát (beleértve a felhasználói módban és a kernel módban felhasznált időt is) az eltelt időhöz (százalékos arányban), az \lstinline{%M} pedig a processz életideje alatt felhasznált maximális memóriaméretet jelenti (kilobyte-okban).
 %https://www.gnu.org/software/time/
 
-A méréseket minden módszer esetén megegyező méretű bemenettel, illetve ugyanazokkal a véletlenszerűen generált lebegőpontos számokkal végeztem mind a C, mind a Rust nyelvű implementációk esetén.
+A méréseket minden rendezési módszer esetén megegyező méretű bemenettel, illetve ugyanazokkal a véletlenszerűen generált lebegőpontos számokkal végeztem mind a C, mind a Rust nyelvű implementációk esetén.
+
+A numerikus integrálás algoritmusok esetén az \[ F(x) = \int_0^{40} x^2 - 1 \] függvény görbe alatti területét közelítettem a \[\left[0, 40\right]\]-on mind az iteratív trapézszabály, mind az iteratív Simpson-formula esetén.
 
 \section{Tervek, észrevételek a mérésekhez}
 
 A méréseket egy Intel i5-4200U processzorral és 8 GB memóriát használó számítógépen futtattam, 4.20.11-es verziószámú Linux-kernellel. Az általam készített mérések kizárólag ezen az eszközön történtek, ugyanakkor az elkészült programok a forráskód szintjén portábilisek.
 
 % TODO: Pontos Rust és C verziók kellenek majd még.
+Rustból az 1.33-as verziót (\lstinline{2aa4c46cf 2019-02-28}), C-ből a 
 
 A C nyelvű implementáció esetén a \lstinline{gcc} fordítóprogram az optimális, \lstinline{-O3} paraméterrel került meghívásra. A Rust nyelvű megoldás esetén pedig a \lstinline{rustc} fordítóprogram a Rust nyelvhez tartozó \lstinline{cargo} csomagkezelő \lstinline{build} paranccsa által hívódik meg. Az általam használt parancs a \lstinline{cargo build --release}, amely alkalmazza a \lstinline{rustc} fordító által kínált legjobb hatásfokú optimalizálási megoldásokat, konkrétan az \lstinline{rustc -C --opt-level=3} parancs kerül meghívásra.
 % https://www.mankier.com/1/cargo-build

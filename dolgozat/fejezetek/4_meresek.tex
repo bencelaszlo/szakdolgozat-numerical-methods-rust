@@ -1,5 +1,6 @@
 \Chapter{Mérések}
-
+% TODO: Binárisok méretének mérése, az erre a feladatra használatos optimalizálási kapcsolókkal.
+% TODO: Fájlok beolvasási idejének mérése.
 \section{Numerikus integrálás}
 
 \subsection{Trapézszabály}
@@ -111,7 +112,7 @@ fn q_trapedozial_rule(a: f32, b: f32) -> f32 {
 
 \subsubsection{Futtatások eredményei}
 
-\includegraphics[width=15.5cm]{kepek/trapedozial_run.eps}
+\includegraphics[width=15.5cm]{kepek/trapedozial_rule_run.eps}
 
 \subsection{Iteratív Simpson-módszer}
 
@@ -178,7 +179,7 @@ fn q_simpsons_rule(a: f32, b: f32) -> f32 {
 }
 \end{lstlisting}
 \subsubsection{Futtatások eredményei}
-\includegraphics[width=15.5cm]{kepek/simpsons_run.eps}
+\includegraphics[width=15.5cm]{kepek/simpsons_rule_run.eps}
 \subsection{Gauss-Legendre-módszer}
 \subsubsection{Rövid matematikai bevezetés}
 \subsubsection{C nyelvű referencia-implementáció}
@@ -325,12 +326,12 @@ pub fn heapsort(n: usize, a: &mut Vec<f32>) {
 \subsubsection{Futtatások eredményei}
 Kupac-rendezés futási ideje
 
-\includegraphics[width=15.5cm]{kepek/heap_run.eps}
+\includegraphics[width=15.5cm]{kepek/heap_sort_run.eps}
 Látható, hogy a kupac-rendezés módszerét tekintve a Rust nyelvű implementáció lassabb, mint a C-s megfelelője.
 
 Kupac-rendezés maximális memóriafoglalása
 
-\includegraphics[width=15.5cm]{kepek/heap_memory.eps}
+\includegraphics[width=15.5cm]{kepek/heap_sort_memory.eps}
 A Rust és C nyelven elkészített implementációk között a maximális memóriafoglalást tekintve nincsenek jelentős eltérések.
 
 \subsection{Shell-rendezés}
@@ -383,12 +384,12 @@ pub fn shell_sort(n: i32, a: &mut Vec<f32>) {
 \subsubsection{Futtatások eredményei}
 Shell-rendezés futási ideje
 
-\includegraphics[width=15.5cm]{kepek/shell_run.eps}
+\includegraphics[width=15.5cm]{kepek/shells_sort_run.eps}
 Látható, hogy a Shell-rendezés módszerét tekintve a Rust nyelvű implementáció lassabb, mint a C-s megfelelője.
 
 Shell-rendezés maximális memóriafoglalása
 
-\includegraphics[width=15.5cm]{kepek/shell_memory.eps}
+\includegraphics[width=15.5cm]{kepek/shells_sort_memory.eps}
 A Rust és C nyelven elkészített implementációk között a maximális memóriafoglalást tekintve nincsenek jelentős eltérések.
 
 \subsection{Gyorsrendezés (Quicksort)}
@@ -511,12 +512,12 @@ fn partition(low: i32, high: i32, arr: &mut Vec<f32>) -> i32 {
 \subsubsection{Futtatások eredményei}
 Gyorsrendezés futási ideje
 
-\includegraphics[width=15.5cm]{kepek/quick_run.eps}
+\includegraphics[width=15.5cm]{kepek/quicksort_run.eps}
 Látható, hogy a gyorsrendezés módszerét tekintve a Rust nyelvű implementáció lassabb, mint a C-s megfelelője.
 
 Gyorsrendezés maximális memóriafoglalása
 
-\includegraphics[width=15.5cm]{kepek/quick_memory.eps}
+\includegraphics[width=15.5cm]{kepek/quicksort_memory.eps}
 A Rust és C nyelven elkészített implementációk között a maximális memóriafoglalást tekintve nincsenek jelentős eltérések.
 
 \section{Interpoláció}
@@ -561,7 +562,7 @@ fn linear_interpolation(x1: f32, y1: f32, x0: f32, y0: f32, x: f32) -> f32 {
 \subsubsection{Futtatások eredményei}
 Lineáris interpoláció futási ideje
 
-\includegraphics[width=15.5cm]{kepek/linear_interpolation_memory.eps}
+\includegraphics[width=15.5cm]{kepek/linear_interpolation_run.eps}
 Látható, hogy a lineáris interpoláció módszerét tekintve a Rust nyelvű implementáció lassabb, mint a C-s megfelelője.
 
 Lineáris interpoláció maximális memóriafoglalása
