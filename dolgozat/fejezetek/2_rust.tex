@@ -67,7 +67,7 @@ Ez a kódrészlet fordításidejű hibához vezet, mert az \lstinline{s} változ
 
 Ha két változó ugyanarra az értékre mutat a memóriában, akkor a későbbi hivatkozás érvényteleníti a korábbi referenciát. Ilyen módon később nem jöhet létre dupla felszabadítási hiba (\textit{double free error}), ami ugyanazon memóriaterület kétszeri felszabadítását jelenti. Ez a megoldás hasonlít más programozási nyelvekben megtalálható \textit{shallow copy} megoldásra, amellyel szemben Rustban különbség, hogy a shallow copy a pointer és a mutatott memóriaterület méretére vonatkozó adatok csak átmásolódnak az új változóba, a Rust viszont érvényteleníti is az ilyen módon "helyettesített" változót. Ennek a működésnek a következménye pedig, hogy a Rust automatikusan soha nem hoz létre \textit{deep copy}t sem (ami magát a mutatott adat másolását jelentené). Ellenben megegyező funkcionalitás elérhető a \lstinline{clone} metódus explicit hívásával:
 
-% TODO: Példa szükségeltetik ide
+% TODO: Példa szükségeltetik ide, Rustos és C++-os is. Meg is kell említeni a C++-os influenciát.
 \begin{lstlisting}[language=Rust, style=boxed]
 
 \end{lstlisting}
@@ -103,7 +103,7 @@ Mivel gyakorlatilag egy új változó jön létre, a példa megfelel a fordító
 
 A Rust egy statikusan típusos nyelv, tehát a változók típusának fordítási időben ki kell derülnie.
 
-zéróköltségű absztrakciók, garantált memóriabiztonság, threads without data races, mintaillesztés, típus-inference, minimális runtime, hatékony C bindings
+zéróköltségű absztrakciók, threads without data races, minimális runtime, hatékony C bindings
 
 task based concurrency. a lightweight taskok párhuzamosan tudnak futni bármilyen adat megosztása nélkül
 
@@ -115,7 +115,7 @@ polimorfizmus, Java-szerű interfészek és Haskell-szerű típososztályok
 
 nincs buffer overflow
 
-"Modern nyelvi elemek": closures, traits, namespaces, destructors, Unicode, type infrence, disjoint unions.
+"Modern nyelvi elemek": namespaces, destructors, Unicode, type infrence, disjoint unions.
 
 \section{Viszonya más programozási nyelvekkel}
 A Rust viszonylagos „fiatalsága” következtében több már meglévő programozási nyelv felépítéséből meríthetett. Ez a fejlesztői által is elismert %(https://doc.rust-lang.org/reference/influences.html)
@@ -123,15 +123,20 @@ tény. A nyelv eddigi története során több változtatást is megélt, az al�
 
 \subsection{SML, OCaml (algebrai adattípusok, mintaillesztés, típus inference, pontosvesszős utasítás-elválasztás)}
 
-\subsection{C++ (hivatkozások, RAII, smart pointerek, move semantics, monomorphization, memóriamodell)} 
+\subsection{C++ (hivatkozások, smart pointerek, monomorphization)}
+A Rust memóriakezelését nagyban befolyásolta a C++ programozási nyelv. Ugyanakkor, a Rustnak nincs formális memóriamodellje.
+% TODO: Forrás a Rust formális memóriamodelljének hiányára.
 
-\subsection{ML Kit, Cyclone (régióalapú memóriakezelés}
+Resource acquisition is initialization (más néven Scope-Based Resource Management): az objektum létrehozása alatt megtörténik az erőforrás allokációja a konstruktor által. A lefoglalt erőforrás deallokációja a destruktor által történik, az objektum megsemmisítésekor (finalization).  Tehát az erőforrások felhasználása az objektumok élettartamához kötött, ami a hatáskörük lejártakor automatikusan véget ér.
+% TODO: RAII forrás C++-hoz. A RAII bekezdés áthelyezése a memóriakezeléshez.
+
+\subsection{ML Kit, Cyclone (régióalapú memóriakezelés)}
 
 \subsection{Haskell (GHC)}: typeclasses, type families
 
 \subsection{Newsqueak, Alef, Limbo (csatornák, párhuzamosság)}
 
-\subsection{Erlang (üzenetküldés, thread failure}
+\subsection{Erlang (üzenetküldés, thread failure)}
 
 \subsection{Swift}: optional bindings
 A Swift nyelvben az optional binding segítségével ellenőrizhető, hogy egy optional tartalmaz-e értéket, ha igen, akkor az értéke felhasználható egy ideiglenes konstansként, vagy változóként, ekkor végrehajthatók tetszőleges feltételes utasítások. %(https://docs.swift.org/swift-book/LanguageGuide/TheBasics.html)
