@@ -20,7 +20,8 @@ Magához a Rust programozási nyelvhez mára több, mint 2000-ren járultak hozz
 %https://www.infoq.com/news/2012/08/Interview-Rust
 % Rust book ide vonatkozó fejezetei
 %https://github.com/rust-lang/rust
-A Rust egy nyílt forráskódú rendszerprogramozási nyelv, melynek felépítése a memóriabiztonságot és a szálbiztonságot garantáló párhuzamosságot helyezi előtérbe. A következő szakaszokban ezek megjelenési módját tekintjük át.
+A Rust egy nyílt forráskódú rendszerprogramozási nyelv, melynek felépítése a memóriabiztonságot és a szálbiztonságot garantáló párhuzamosságot helyezi előtérbe. A következő szakaszokban ezek megjelenési módját tekintjük át. A Rust viszonylagos „fiatalsága” következtében több már meglévő programozási nyelv felépítéséből meríthetett. Ez a fejlesztői által is elismert tény. %(https://doc.rust-lang.org/reference/influences.html)
+A nyelv eddigi története során több változtatást is megélt, az alábbiakban részletezésre kerülnek ezek a nyelvek.
  
 \subsection{Ownership-alapú memóriakezelés}
 
@@ -48,7 +49,6 @@ A referenciák használatát függvényparaméterként borrowingnak (tükörford
 
 Egy mutable és egy immutable referencia nem lehet egyidőben, hogy olvasáskor se léphessen fel inkonzisztencia. Mutable referencia nélkül természetesen bármennyi immutable referencia használata lehetséges.
 
-% Dangling references / pointers
 A Rust garantálja, hogy felszabadított területre ne mutathasson referencia (\textit{dangling reference}).
 %Átalakítani a példát
 \begin{lstlisting}[language=Rust, style=boxed]
@@ -63,17 +63,23 @@ fn dangle() -> &String {
 \end{lstlisting}
 Ez a kódrészlet fordításidejű hibához vezet, mert az \lstinline{s} változó a \lstinline{Dangle} függvény végrehajtásánál eltűnik, mert véget ér a függvény scope-ja, ennek ellenére a kódrészlet megpróbálja visszaadni az \lstinline{s} változóra mutató referenciát, ami a scope-ból való kilépéssel már felszabadított memóriaterületre mutat.
 
+\subsubsection{Resource qcquisition is initalization (más néven Scope-Based Resource Management}
+Az objektum létrehozása alatt megtörténik az erőforrás allokációja a konstruktor által. A lefoglalt erőforrás deallokációja a destruktor által történik, az objektum megsemmisítésekor (finalization).  Tehát az erőforrások felhasználása az objektumok élettartamához kötött, ami a hatáskörük lejártakor automatikusan véget ér.
+% TODO: RAII forrás C++-hoz. A RAII bekezdés áthelyezése a memóriakezeléshez.
+
 \subsubsection{A move művelet}
 
-Ha két változó ugyanarra az értékre mutat a memóriában, akkor a későbbi hivatkozás érvényteleníti a korábbi referenciát. Ilyen módon később nem jöhet létre dupla felszabadítási hiba (\textit{double free error}), ami ugyanazon memóriaterület kétszeri felszabadítását jelenti. Ez a megoldás hasonlít más programozási nyelvekben megtalálható \textit{shallow copy} megoldásra, amellyel szemben Rustban különbség, hogy a shallow copy a pointer és a mutatott memóriaterület méretére vonatkozó adatok csak átmásolódnak az új változóba, a Rust viszont érvényteleníti is az ilyen módon "helyettesített" változót. Ennek a működésnek a következménye pedig, hogy a Rust automatikusan soha nem hoz létre \textit{deep copy}t sem (ami magát a mutatott adat másolását jelentené). Ellenben megegyező funkcionalitás elérhető a \lstinline{clone} metódus explicit hívásával:
-
-% TODO: Példa szükségeltetik ide, Rustos és C++-os is. Meg is kell említeni a C++-os influenciát.
+Ha két változó ugyanarra az értékre mutat a memóriában, akkor a későbbi hivatkozás érvényteleníti a korábbi referenciát. Ilyen módon később nem jöhet létre dupla felszabadítási hiba (\textit{double free error}), ami ugyanazon memóriaterület kétszeri felszabadítását jelenti. Ez a megoldás hasonlít más programozási nyelvekben megtalálható \textit{shallow copy} megoldásra, amellyel szemben Rustban különbség, hogy a shallow copy a pointer és a mutatott memóriaterület méretére vonatkozó adatok csak átmásolódnak az új változóba, a Rust viszont érvényteleníti is az ilyen módon „helyettesített” változót. Ennek a működésnek a következménye pedig, hogy a Rust automatikusan soha nem hoz létre \textit{deep copy}t sem (ami magát a mutatott adat másolását jelentené). Ellenben megegyező funkcionalitás elérhető a \lstinline{clone} metódus explicit hívásával. A memóriakezelés más jellemzőihez hasonlóan, a Rustban a move művelet esetében a C++-os hatás figyelhető meg.
+%https://en.cppreference.com/w/cpp/utility/move
 \begin{lstlisting}[language=Rust, style=boxed]
-
+    let original_vector: Vec<i32> = vec![1, 2, 3, 4, 5];
+    let new_vector = original_vector;
+    let test_vector = original_vector;
 \end{lstlisting}
+Fordításkor hibára vezet, mert a vektorra, amelyre eredetileg az \lstinline{original_vector} mutatott,  már a \lstinline{new_vector} mutat, a \lstinline{orignal_vector}-tól „elmozdított” érték. Ennek következtében a \lstinline{test_vector} már üres memóriaterületre mutatna, amit azonban a Rust fordító nem engedélyez.
 
-\subsection{Mutability}
-Rustban alapértelmezés szerint minden változó immutable, azaz csak egyszer rendelhető hozzájuk érték. Ez egyszerűbbé teszi a többszálú programok fejlesztését, ugyanis így minden szál számára garantálható, hogy a változó értéke nem fog megváltozni. Nem keverendő össze a konstansokkal, amelyeket a \texttt{const} kulcsszó használatával deklarálhatunk Rustban a \texttt{let} helyett. Utóbbiak mindenképpen immutable változók (nem csak alapértelmezetten) és az értékadó utasításukban is csak konstans kifejezések szerepelhetnek, továbbá minden esetben el kell látni típus annotációval őket.
+\subsubsection{Mutability}
+Rustban alapértelmezés szerint minden változó immutable, azaz csak egyszer rendelhető hozzájuk érték. Ez egyszerűbbé teszi a többszálú programok fejlesztését, ugyanis így minden szál számára garantálható, hogy a változó értéke nem fog megváltozni. Nem keverendő össze a konstansokkal, amelyeket a \texttt{const} kulcsszó használatával deklarálhatunk Rustban a \texttt{let} helyett. Utóbbiak mindenképpen immutable változók (nem csak alapértelmezetten) és az értékadó utasításukban is csak konstans kifejezések szerepelhetnek, továbbá minden esetben el kell látni típus annotációval őket. A konstansok névkonvenció szerint mind nagybetűsök, alulvonással (\lstinline{_}) elválasztva az esetleges összetett azonosítókat.
 % https://doc.rust-lang.org/book/ch03-01-variables-and-mutability.html
 Ha megpróbálnánk egy immutable változóhoz egynél többször is értéket adni, például:
 \begin{lstlisting}[language=Rust, style=boxed]
@@ -90,56 +96,67 @@ let mut v = 0;
 v = 0;
 \end{lstlisting}
 Egy másik megoldás ilyen esetekre a funckcionális nyelvekre %citation needed
-jellemző \textit{shadowing} technika használata, vagyis egy korábban már deklarált változó "felülírása" egy azonos nevű, új változóval. Az előző példánál maradva:
+jellemző \textit{shadowing} technika használata, vagyis egy korábban már deklarált változó „felülírásra” egy azonos nevű, új változóval. Az előző példánál maradva:
 \begin{lstlisting}[language=Rust, style=boxed]
 let v = 0;
 let v = "0";
 \end{lstlisting}
 Mivel gyakorlatilag egy új változó jön létre, a példa megfelel a fordító ellenőrzésén annak ellenére, hogy más típusú. A shadowing technikával létrejött új változó is természetesen immutable lesz. Összetett adatszerkezetek esetén nem javasolt a használata az általa okozott teljesítmény-csökkenés miatt.
 
-% TODO: A fejezet további részét még rendbe kell szedni!
+\subsubsection{Statikus típusosság}
+A Rust egy statikusan típusos nyelv, tehát a változók típusának fordítási időben ki kell derülnie. Azonban a Rust használja a type inference lehetőségét. Type inference azt jelenti, hogy a típusrendszer ki tudja találni a változó értékének tényleges típusát, ha az egyértelmű. A fordítóprogram (\lstinline{rustc}) „kitalálja”. Ehhez az SML és az OCaml nyelvek gyakoroltak hatást a Rustra. Egy példa Rust nyelven:
+\begin{lstlisting}[language=Rust, style=boxed]
+  let x: i32 = 2;
+  let y = x + 2;
+\end{lstlisting}
+A kódrészlet lefordul, mert a fordítóprogram az \lstinline{x} változó típusát ismeri (\lstinline{i32}), a (\lstinline{2}) pedig, mint szám literál, gyakorlatilag bármilyen numerikus típusnak megfelelő érték lehet (nem veszít ugyanis a pontosságából), ezért a fordító \lstinline{i32}-ként kezeli, és két \lstinline{i32} változó értéke szintén egy \lstinline{i32} típusú szám lesz.
+%https://ocaml.org/learn/tutorials/basics.html#Type-inference
+%https://smlnj.org/doc/Conversion/types.html
 
-\subsection{Statikus típusosság}
-
-A Rust egy statikusan típusos nyelv, tehát a változók típusának fordítási időben ki kell derülnie.
+\subsubsection{Smart pointerek}
+Eredetileg a C++ nyelvből eredeztethető adatstruktúra, amely a pointeren kívül más metaadatokat is tárol.
+%https://doc.rust-lang.org/book/ch15-00-smart-pointers.html
 
 zéróköltségű absztrakciók, threads without data races, minimális runtime, hatékony C bindings
 
 task based concurrency. a lightweight taskok párhuzamosan tudnak futni bármilyen adat megosztása nélkül
 
-higher-order functions (closures)
+\subsection{Closures (higher-order functions)}
 
 \subsection{Trait-alapú generikusok}
 
-polimorfizmus, Java-szerű interfészek és Haskell-szerű típososztályok
+polimorfizmus, Java-szerű interfészek
+„Modern nyelvi elemek”: namespaces
 
-nincs buffer overflow
+Rustban az \lstinline{enum}ok a funkcionális programozási nyelvek algebrai adattípusaira hasonlít, mint az OCaml, vagy a Haskell.
+\begin{lstlisting}[language=Rust, style=boxed]
+enum Day {
+  Monday,
+  Tuesday,
+  Wednesday,
+  Thursday,
+  Friday,
+  Saturday,
+  Sunday
+}
+\end{lstlisting}
+Az \lstinline{enum} definíciója után a névterével azonosítva használható: \lstinline{let day = Day::Monday}.
+% https://doc.rust-lang.org/book/ch06-00-enums.html
+%https://wiki.haskell.org/Algebraic_data_type
 
-"Modern nyelvi elemek": namespaces, destructors, Unicode, type infrence, disjoint unions.
+\subsection{Mintaillesztés}
+Mintaillesztéssel ellenőrzi a \lstinline{match}ben lévő mintát (patternt) sorrendben a karokon, és az illeszkedő karon (arm) folytatja a futtatást. Ha nincs tovább gyerek, végrehajtja az utasítást. A \lstinline{match} vezérlési szerkezettel jól olvasható kód hozható létre, különsen \lstinline{enum}okkal együtt alkalmazva. Ha nem akarjuk az összes lehetséges esetet lekezelni, akkor az \lstinline{_} operátor használható, ami egy olyan mintát jelöl, amelyre minden illeszkedik.
+\begin{lstlisting}[language=Rust, style=boxed]
+match day {
+  Day::Monday => println!("First Day of the Week"),
+  Day::Sunday => println!("Last Day of the Week"),
+}
+\end{lstlisting}
+% https://doc.rust-lang.org/book/ch06-02-match.html
+%/https://ocaml.org/learn/tutorials/data_types_and_matching.html
 
-\section{Viszonya más programozási nyelvekkel}
-A Rust viszonylagos „fiatalsága” következtében több már meglévő programozási nyelv felépítéséből meríthetett. Ez a fejlesztői által is elismert %(https://doc.rust-lang.org/reference/influences.html)
-tény. A nyelv eddigi története során több változtatást is megélt, az alábbiakban részletezésre kerül minden más nyelv, amely - legyen aktuális, vagy korábbi - hatást fejtett ki a Rustra.
-
-\subsection{SML, OCaml (algebrai adattípusok, mintaillesztés, típus inference, pontosvesszős utasítás-elválasztás)}
-
-\subsection{C++ (hivatkozások, smart pointerek, monomorphization)}
-A Rust memóriakezelését nagyban befolyásolta a C++ programozási nyelv. Ugyanakkor, a Rustnak nincs formális memóriamodellje.
-% TODO: Forrás a Rust formális memóriamodelljének hiányára.
-
-Resource acquisition is initialization (más néven Scope-Based Resource Management): az objektum létrehozása alatt megtörténik az erőforrás allokációja a konstruktor által. A lefoglalt erőforrás deallokációja a destruktor által történik, az objektum megsemmisítésekor (finalization).  Tehát az erőforrások felhasználása az objektumok élettartamához kötött, ami a hatáskörük lejártakor automatikusan véget ér.
-% TODO: RAII forrás C++-hoz. A RAII bekezdés áthelyezése a memóriakezeléshez.
-
-\subsection{ML Kit, Cyclone (régióalapú memóriakezelés)}
-
-\subsection{Haskell (GHC)}: typeclasses, type families
-
-\subsection{Newsqueak, Alef, Limbo (csatornák, párhuzamosság)}
-
-\subsection{Erlang (üzenetküldés, thread failure)}
-
-\subsection{Swift}: optional bindings
-A Swift nyelvben az optional binding segítségével ellenőrizhető, hogy egy optional tartalmaz-e értéket, ha igen, akkor az értéke felhasználható egy ideiglenes konstansként, vagy változóként, ekkor végrehajthatók tetszőleges feltételes utasítások. %(https://docs.swift.org/swift-book/LanguageGuide/TheBasics.html)
+\subsection{Optional bindings}
+A Swift nyelvben egy optional binding segítségével ellenőrizhető, hogy egy optional tartalmaz-e értéket, ha igen, akkor az értéke felhasználható egy ideiglenes konstansként, vagy változóként, ekkor végrehajthatók tetszőleges feltételes utasítások. %(https://docs.swift.org/swift-book/LanguageGuide/TheBasics.html)
 \begin{lstlisting}[language=Swift]
   if let constantName = someOptional {
     statements
@@ -158,11 +175,17 @@ if let constantName = someOptional {
 }
 \end{lstlisting}
 
+\subsection{Típusosztályok}
+Haskell-szerű típusosztályok:
+% https://www.haskell.org/tutorial/classes.html
+
+\subsection{ML Kit, Cyclone (régióalapú memóriakezelés)}
+\subsection{Newsqueak, Alef, Limbo (csatornák, párhuzamosság)}
+\subsection{Erlang (üzenetküldés, thread failure)}
 \subsection{Scheme (hygienic macros}
 
-\subsection{C\# (attribútumok)}
-
-Az attribútumok metaadatok megadására szolgálnak, amelyek a definiált típusról adhatnak.
+\subsection{Attribútumok}
+Az attribútumok metaadatok megadására szolgálnak, amelyek a definiált típusról adhatnak. Az attribútumokat a C\# nyelvből vették át a Rust fejlesztői.
 
 C\#-ban a következő módon adhatunk meg egy attribútumot:
 \begin{lstlisting}
@@ -196,7 +219,7 @@ A Rust egy egyre népszerűbb, a GitHub felmérése szerint %(https://octoverse.
 az ötödik leggyorsabban növekvő népszerűségű programozási nyelv a GitHubon tárolt kódokat tekintve. A TIOBE-index szerint %https://www.tiobe.com/tiobe-index/
 2019. márciusában a 35. legnépszerűbb programozási nyelv.
 
-Egyre több területen láthatunk példákat a használatára "élesben" is: a Mozilla Firefox webböngésző Servo komponensén teljes átírásra került Rustban
+Egyre több területen láthatunk példákat a használatára: a Mozilla Firefox webböngésző Servo komponensén teljes átírásra került Rustban
 %https://servo.org/
 , ami a teljesítményen is látható javulást hozott. %citation needed
 , már (POSIX-kompatibilis) operációs rendszer (Redux OS), fájlrendszerek, beágyazott rendszerek, parancssoros eszközök (CLI tools) %https://github.com/BurntSushi/ripgrep
@@ -207,5 +230,3 @@ játékprogramokhoz %%https://www.amethyst.rs/
 %https://www.piston.rs/
 Ezen kívül fejlesztés alatt áll Python-interpreter %(https://github.com/RustPython/RustPython),  
 keresztplatformos, GPU-gyorsított terminál emulátor: %https://github.com/jwilm/alacritty 
-
-A Mozillán kívül már népszerű Dropboxban és a Cloudflare szoftvereiben is találkozhatnánk Rust nyelven írt kóddal (természetesen csak elméletben, ezek zárt forráskódú szolgáltatások).
