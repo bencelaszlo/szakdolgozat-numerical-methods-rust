@@ -3,6 +3,11 @@
 \section{Profilozás}
 \section{Technikai részletek}
 % Technikai részletek bemutatása, ami alapján a számítási teljesítmény jobb-rosszabb lehet, mint C esetében.
+Lebegőpontos számok ábrázolását a Rust az IEEE-754-es szabványnak megfelelően végzni. Az egyszeres pontosságú lebegőpontos számokat az \lstinline{f32}, a dupla pontosságú lebegőpontos számokat pedig az \lstinline{f64} típusok szolgáltatják. C-ben ez nincs specifikálva, de általában az IEEE szabványát követi. Az egyszeres pontosságú a \lstinline{float}, a dupla pontosságú lebegőpontos szám a \lstinline{double} típussal reprezentálható.
+%https://doc.rust-lang.org/book/ch03-02-data-types.html
+
+A Rust nyelven implementált rendezési eljárások esetén a beépített \lstinline{Vec} adatszerkezetet használtam, melynek működéséhez hasonló saját típust definiáltam C-ben is. Ugyanakkor megemlítendő, hogy a C-s \lstinline{Vec} típus nem implementálja a Rustban
+%https://doc.rust-lang.org/stable/nomicon/vec-alloc.html
 \section{Fordítóprogram-specifikus beállítások}
 \subsection{A GNU GCC fordítóprogram specifikus beállításai (C)}
 A C nyelvű implementációk fordításához a GNU GCC fordítóprogramot használtam, ami többféle optimalizálási lehetőséget is kínál. Alapértelmezetten, bármilyen opció megadása nélkül a fordító a fordítási időt próbálja minimalizálni.
