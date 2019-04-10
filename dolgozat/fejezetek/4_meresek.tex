@@ -58,7 +58,7 @@ fn trapedozial_rule(a: f32, b: f32, n: i32) -> f32 {
 
 \subsubsection{Rövid matematikai bevezetés}
 
-Az iteratív trapézszabály a trapézszabályra épül. Lényege, hogy a függvénygörbe alatti területre illesztett trapézok számát iteratívan növeli, így minden iterációban egyre jobb közelítést ad. A számítógép implementációk esetén ez a finomítási folyamat akkor áll meg, amikor az elmúlt iterációban nem változott "sokat" a közelítés értéke.
+Az iteratív trapézszabály a trapézszabályra épül. Lényege, hogy a függvénygörbe alatti területre illesztett trapézok számát iteratívan növeli, így minden iterációban egyre jobb közelítést ad. A számítógép implementációk esetén ez a finomítási folyamat akkor áll meg, amikor az elmúlt iterációban nem változott jelentősen a közelítés értéke.
 
 \subsubsection{C nyelvű referencia-implementáció}
 
@@ -243,13 +243,13 @@ fn q_gauss_legendre(a: f32, b: f32) -> f32 {
 
 \section{Rendezés}
 
-\subsection{Kupac-rendezés}
+\subsection{Kupacrendezés}
 
 \subsubsection{Rövid matematikai bevezetés}
 
-\subsubsection{C nyelvű referencia-implementáció}
+A kupacrendezés két részre osztja az inputot: egy rendezett és egy nem rendezett részre. A gyökérelem (legnagyobb elem) megkeresésével és a rendezett részbe mozgatásával egyre csökkenti a nem rendezett rész méretét. Legrosszabb esetben is \[ \Theta(n log n \] időkomplexitással rendelkezik.
 
-% TODO: A Vec-et, mint típust részletezni!
+\subsubsection{C nyelvű referencia-implementáció}
 
 \cppstyle{\begin{lstlisting}[language=c++]
 void heapify(Vec *a, unsigned n, unsigned i) {
@@ -336,6 +336,14 @@ A Rust és C nyelven elkészített implementációk között a maximális memór
 
 \subsection{Shell-rendezés}
 \subsubsection{Rövid matematikai bevezetés}
+Az egymástól távoli elemek összehasonlításával kezdi a rendezést, majd a szomszédos elemek felé, egyre közelebbi elemeket összehasonlítva, és szükség szerint felcserélve azokat. 
+
+Elméleti futásidő legjobb és átlagos esetben:
+\[\Theta(n log n) \]
+
+Elméleti futásidő legrosszabb eset:
+\[\Theta(n^2)\]
+
 \subsubsection{C nyelvű referencia-implementáció}
 \cppstyle{\begin{lstlisting}[language=c++]
 void shell_sort(unsigned n, Vec *a) {
@@ -394,6 +402,14 @@ A Rust és C nyelven elkészített implementációk között a maximális memór
 
 \subsection{Gyorsrendezés (Quicksort)}
 \subsubsection{Rövid matematikai bevezetés}
+A gyorsrendezés egy rekurzív algoritmus, amely az „oszd meg és uralkodj” elve alapján működik. Az input elemeket két részre osztja az alapján, hogy egy kiválasztott (pivot) elemtől kisebbek, vagy nagyobbak. Az így létrejött két részre meghívásra kerül a gyorsrendezés, egészen addig, amíg egy elemű részek nem jönnek létre. Egyetlen elem mindig rendezett. Az implementációban a Robert Sedgewick: Implementing Quicksort programs (Oct. 1978, Communications of the ACM 21 (10): 847–857) ajánlásának megfelelően kerül kiválasztásra a pivot elem, így elkerülhető a legrosszabb eset, a már rendezett elemek listája.
+
+Elméleti futásidő legjobb és átlagos esetben:
+\[\Theta(n log n) \]
+
+Elméleti futásidő legrosszabb eset:
+\[\Theta(n^2)\]
+ 
 \subsubsection{C nyelvű referencia-implementáció}
 \cppstyle{\begin{lstlisting}[language=c++]
 int partition(int low, int high, Vec *arr) {
@@ -418,7 +434,7 @@ int partition(int low, int high, Vec *arr) {
     int j;
 
     i = low - 1;
-	j = high + 1;
+	  j = high + 1;
 
     while (1) {
         while (1) {
