@@ -63,13 +63,11 @@ fn dangle() -> &String {
 \end{lstlisting}
 Ez a kódrészlet fordításidejű hibához vezet, mert az \lstinline{s} változó a \lstinline{Dangle} függvény végrehajtásánál eltűnik, mert véget ér a függvény scope-ja, ennek ellenére a kódrészlet megpróbálja visszaadni az \lstinline{s} változóra mutató referenciát, ami a scope-ból való kilépéssel már felszabadított memóriaterületre mutat.
 
-\subsubsection{Resource qcquisition is initalization (más néven Scope-Based Resource Management}
+\subsubsection{Resource acquisition is initalization (más néven Scope-Based Resource Management}
 Az objektum létrehozása alatt megtörténik az erőforrás allokációja a konstruktor által. A lefoglalt erőforrás deallokációja a destruktor által történik, az objektum megsemmisítésekor (finalization).  Tehát az erőforrások felhasználása az objektumok élettartamához kötött, ami a hatáskörük lejártakor automatikusan véget ér.
-% TODO: RAII forrás C++-hoz. A RAII bekezdés áthelyezése a memóriakezeléshez.
 
-\subsubsection{A move művelet}
-
-Ha két változó ugyanarra az értékre mutat a memóriában, akkor a későbbi hivatkozás érvényteleníti a korábbi referenciát. Ilyen módon később nem jöhet létre dupla felszabadítási hiba (\textit{double free error}), ami ugyanazon memóriaterület kétszeri felszabadítását jelenti. Ez a megoldás hasonlít más programozási nyelvekben megtalálható \textit{shallow copy} megoldásra, amellyel szemben Rustban különbség, hogy a shallow copy a pointer és a mutatott memóriaterület méretére vonatkozó adatok csak átmásolódnak az új változóba, a Rust viszont érvényteleníti is az ilyen módon „helyettesített” változót. Ennek a működésnek a következménye pedig, hogy a Rust automatikusan soha nem hoz létre \textit{deep copy}t sem (ami magát a mutatott adat másolását jelentené). Ellenben megegyező funkcionalitás elérhető a \lstinline{clone} metódus explicit hívásával. A memóriakezelés más jellemzőihez hasonlóan, a Rustban a move művelet esetében a C++-os hatás figyelhető meg.
+\subsubsection{A move és a copy művelet}
+Ha két változó ugyanarra az értékre mutat a memóriában, akkor a későbbi hivatkozás érvényteleníti a korábbi referenciát. Ilyen módon később nem jöhet létre dupla felszabadítási hiba (\textit{double free error}), ami ugyanazon memóriaterület kétszeri felszabadítását jelenti. Ez a megoldás hasonlít más programozási nyelvekben megtalálható \textit{shallow copy} megoldásra, amellyel szemben Rustban különbség, hogy a shallow copy a pointer és a mutatott memóriaterület méretére vonatkozó adatok csak átmásolódnak az új változóba, a Rust viszont érvényteleníti is az ilyen módon „helyettesített” változót. Ennek a működésnek a következménye pedig, hogy a Rust automatikusan soha nem hoz létre \textit{deep copy}t sem (ami magát a mutatott adat másolását jelentené). Ellenben megegyező funkcionalitás elérhető a \lstinline{clone} metódus explicit hívásával. A Rust a \lstinline{Copy} traitet alkalmazza a stackben tárolt értékre mutató típusokra. A \lstinline{Copy} traitet implementáló típusoknak a \lstinline{Drop} traitet is implementálniuk kell. Alapvetően az egész és a lebegőpontos számok, logikai értékek, illetve az ezekből álló tuple adatszerkezetek rendelkeznek a \lstinline{Copy} traittel. A memóriakezelés más jellemzőihez hasonlóan, a Rustban a move művelet esetében a C++-os hatás figyelhető meg.
 %https://en.cppreference.com/w/cpp/utility/move
 \begin{lstlisting}[language=Rust, style=boxed]
     let original_vector: Vec<i32> = vec![1, 2, 3, 4, 5];
@@ -117,16 +115,29 @@ A kódrészlet lefordul, mert a fordítóprogram az \lstinline{x} változó típ
 Eredetileg a C++ nyelvből eredeztethető adatstruktúra, amely a pointeren kívül más metaadatokat is tárol.
 %https://doc.rust-lang.org/book/ch15-00-smart-pointers.html
 
-zéróköltségű absztrakciók, threads without data races, minimális runtime, hatékony C bindings
+\subsection{Makrók}
+A makró, mint metaprogramozási eszköz, olyan kód, amely kódot állít elő. Ennek több előnye is van, a kevesebb kód mellett például a paraméterek száma és típusa változhat, ellentétben a függvényekkel. Ez azért történhet meg, mert a fordító a makrókat még más kódrészek előtt kibontja és ellenőrzi. Azonban használatuk bonyolultabb, és nehezebben olvashatóak.
 
-task based concurrency. a lightweight taskok párhuzamosan tudnak futni bármilyen adat megosztása nélkül
+\subsubsection{deklaratív makrók}
+A \lstinline{match} konstrukcióhoz hasonlító megoldás, a Rust forráskódot fordításidőben összehasonlítja a makróban megadott mintákkal, és egyezés esetén a kapott forráskódot lecseréli az adott mintához kapcsoltra. Ez fordításidőben történik, hogy a futásidő költséget csökkentse. A \lstinline{!macro_rules} konstrukcióval lehetséges makrókat definiálni Rustban. Ilyen például a standard könyvtárban lévő \lstinline{vec!} makró, melynek segítségével egy \lstinline{Vec<T>} típusú vektort tölthetünk fel a makró paramétereként tömbszerűen felsorolt elemekkel.
 
-\subsection{Closures (higher-order functions)}
+\subsubsection{Procedurális makrók}
+A procedurális makrók tulajdonképpen függvények, amelyek Rust forráskódot kapnak paraméterül és Rust forráskódot adnak is vissza. A deklaratív makrókkal szemben a procedurális makrók esetén nincs mintaillesztés, a forráskódon végzendő változtatásokat a makróban kell megadni. A kötelezendően megadandó attribútum a makró típusát adja meg.
+\begin{lstlisting}[language=Rust, style=boxed]
+#[attribute_example]
+  pub fn procedural_macro_example(input: TokenStream) -> TokenStream {
+}
+\end{lstlisting}
+
+%https://doc.rust-lang.org/book/ch19-06-macros.html
+
+%\subsection{Closures (higher-order functions)}
+%\subsection{Párhuzamosság}
+%Task-based concurrency: a lightweight taskok párhuzamosan tudnak futni bármilyen adat megosztása nélkül.
 
 \subsection{Trait-alapú generikusok}
-
-polimorfizmus, Java-szerű interfészek
-„Modern nyelvi elemek”: namespaces
+A traitek által megvalósítható a Haskell nyelvben megtalálható típusosztályokra hasonlító konstrukciók. Lényege, hogy több különböző adattípus hasonlóságát mutató tulajdonságot, trait-et az összes hasonló típusra (tehát a típusosztályra) meg kell valósítani, amelyek aztán hasonló módon használhatóak minden típus esetén. Az egyes adattípusok trait-implementáció persze különbözhetnek egymástól.
+% https://www.haskell.org/tutorial/classes.html
 
 Rustban az \lstinline{enum}ok a funkcionális programozási nyelvek algebrai adattípusaira hasonlít, mint az OCaml, vagy a Haskell.
 \begin{lstlisting}[language=Rust, style=boxed]
@@ -145,7 +156,7 @@ Az \lstinline{enum} definíciója után a névterével azonosítva használható
 %https://wiki.haskell.org/Algebraic_data_type
 
 \subsection{Mintaillesztés}
-Mintaillesztéssel ellenőrzi a \lstinline{match}ben lévő mintát (patternt) sorrendben a karokon, és az illeszkedő karon (arm) folytatja a futtatást. Ha nincs tovább gyerek, végrehajtja az utasítást. A \lstinline{match} vezérlési szerkezettel jól olvasható kód hozható létre, különsen \lstinline{enum}okkal együtt alkalmazva. Ha nem akarjuk az összes lehetséges esetet lekezelni, akkor az \lstinline{_} operátor használható, ami egy olyan mintát jelöl, amelyre minden illeszkedik.
+Mintaillesztéssel ellenőrzi a \lstinline{match}ben lévő mintát (patternt) sorrendben a karokon, és az illeszkedő karon (arm) folytatja a futtatást. Ha nincs tovább gyerek, végrehajtja az utasítást. A \lstinline{match} vezérlési szerkezettel jól olvasható kód hozható létre, különsen \lstinline{enum}okkal együtt alkalmazva. Ha nem akarjuk az összes lehetséges esetet lekezelni, akkor az \lstinline{_} operátor használható, ami egy olyan mintát jelöl, amelyre minden illeszkedik. Hasonlít más nyelvekben megtalható \lstinline{switch} elágazásokra, azonban itt az egyes ágakról nem „folyik át” a végrehajtás az explicit \lstinline{break} utasítás kiadása nélkül.
 \begin{lstlisting}[language=Rust, style=boxed]
 match day {
   Day::Monday => println!("First Day of the Week"),
@@ -174,10 +185,6 @@ if let constantName = someOptional {
   statements
 }
 \end{lstlisting}
-
-\subsection{Típusosztályok}
-Haskell-szerű típusosztályok:
-% https://www.haskell.org/tutorial/classes.html
 
 \subsection{ML Kit, Cyclone (régióalapú memóriakezelés)}
 \subsection{Newsqueak, Alef, Limbo (csatornák, párhuzamosság)}
