@@ -1,13 +1,66 @@
 \Chapter{Optimalizálás}
 
 \section{Profilozás}
+Azoknál a módszereknél, amelyek mért futásidejében jelentős különbség adódott a C-s, illetve a Rustos implementáció között van egy közös jellemzőjük: nagyméretű inputot olvasnak be fájlból. Így adódik a felvetés, hogy a fájl beolvasáshoz szükséges idő jelenti a differenciát a két implementáció között.
+
+\includegraphics[width=15.5cm]{kepek/file_read.eps}
+A grafikonon látható, hogy Rustban a beolvasás jóval lassabb, a futásidők különbségét magyarázza.
+\subsection{Futásidők a fájl beolvasása nélkül}
+\subsubsection{Kupacrendezés}
+\includegraphics[width=15.5cm]{kepek/heap_sort_run_without_read.eps}
+\subsubsection{Shell-rendezés}
+\includegraphics[width=15.5cm]{kepek/shells_sort_run_without_read.eps}
+\subsubsection{Gyorsrendezés}
+\includegraphics[width=15.5cm]{kepek/quicksort_run_without_read.eps}
+\subsubsection{Lineáris interpoláció}
+\includegraphics[width=15.5cm]{kepek/linear_interpolation_run_without_read.eps}
+Látható, hogy maga a módszer a Rust implementációban minden esetben gyorsabb, ha az inputfájlok beolvasásást nem mérjük.
+
 \section{Technikai részletek}
 % Technikai részletek bemutatása, ami alapján a számítási teljesítmény jobb-rosszabb lehet, mint C esetében.
 Lebegőpontos számok ábrázolását a Rust az IEEE-754-es szabványnak megfelelően végzni. Az egyszeres pontosságú lebegőpontos számokat az \lstinline{f32}, a dupla pontosságú lebegőpontos számokat pedig az \lstinline{f64} típusok szolgáltatják. C-ben ez nincs specifikálva, de általában az IEEE szabványát követi. Az egyszeres pontosságú a \lstinline{float}, a dupla pontosságú lebegőpontos szám a \lstinline{double} típussal reprezentálható.
 %https://doc.rust-lang.org/book/ch03-02-data-types.html
 
-A Rust nyelven implementált rendezési eljárások esetén a beépített \lstinline{Vec} adatszerkezetet használtam, melynek működéséhez hasonló saját típust definiáltam C-ben is. Ugyanakkor megemlítendő, hogy a C-s \lstinline{Vec} típus nem implementálja a Rustban
+A Rust nyelven implementált rendezési eljárások esetén a beépített \lstinline{Vec} adatszerkezetet használtam, melynek működéséhez hasonló saját típust definiáltam C-ben is. Ugyanakkor megemlítendő, hogy a C-s \lstinline{Vec} típus nem implementálja a Rustban meglévő vektortípus által implementált összes metódust, csak azt azokat, amelyek a dolgozatban bemutatott módszerek által használtak.
 %https://doc.rust-lang.org/stable/nomicon/vec-alloc.html
+\cppstyle{\begin{lstlisting}[language=c++]
+typedef struct Vec {
+  float *elements;
+  size_t len;
+  size_t capacity;
+}
+
+void vec_init(Vec *vec, size_t with_capacity) {
+    vec->elements = (float*)malloc(with_capacity * sizeof(float) );
+    vec->len = 0;
+    vec->capacity = with_capacity;
+}
+
+void vec_insert(Vec *vec, float element) {
+    if (vec->len == vec->capacity) {
+        vec->capacity *= 2;
+        vec->elements = (float *)realloc(vec->elements, vec->capacity * sizeof(float) );
+    }
+    vec->elements[vec->len++] = element;
+}
+
+Vec vec_copy(Vec *original_vec) {
+    Vec new_vec;
+    vec_init(&new_vec, original_vec->capacity);
+    
+    for (unsigned i = 0; i < original_vec->len; i++) {
+        vec_insert(&new_vec, original_vec->elements[i]);
+    }
+    return new_vec;
+}
+
+void vec_free(Vec *vec) {
+    free(vec->elements);
+    vec->elements = NULL;
+    vec->len = vec->capacity = 0;
+}
+\end{lstlisting}}
+
 \section{Fordítóprogram-specifikus beállítások}
 \subsection{A GNU GCC fordítóprogram specifikus beállításai (C)}
 A C nyelvű implementációk fordításához a GNU GCC fordítóprogramot használtam, ami többféle optimalizálási lehetőséget is kínál. Alapértelmezetten, bármilyen opció megadása nélkül a fordító a fordítási időt próbálja minimalizálni.
