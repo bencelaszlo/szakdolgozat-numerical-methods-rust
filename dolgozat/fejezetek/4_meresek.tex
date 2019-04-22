@@ -1,6 +1,5 @@
 \Chapter{Mérések}
 % TODO: Binárisok méretének mérése, az erre a feladatra használatos optimalizálási kapcsolókkal.
-% TODO: Fájlok beolvasási idejének mérése.
 \section{Numerikus integrálás}
 
 \subsection{Trapézszabály}
@@ -36,19 +35,20 @@ float trapedozial_rule(float a, float b, int n) {
 \subsubsection{Az algoritmus egy implementációja Rustban}
 
 \begin{lstlisting}[language=Rust, style=boxed]
-fn trapedozial_rule(a: f32, b: f32, n: i32) -> f32 {
-  let mut _x: f32;
-  let mut _s: f32;
-  let h: f32;
-  
-  h = (b - a) / (n as f32);
-  _x = a;
-  _s = 0.0;
-  for _i in 1..n {
-      _x += h;
-      _s += parameter_function(_x);
-  }
-  return 0.5 * (parameter_function(a) + 2.0 * _s + parameter_function(b));
+pub fn trapedozial_rule(a: f32, b: f32, n: i32) -> f32 {
+    let mut x: f32;
+    let mut s: f32;
+    let h: f32;
+
+    h = (b - a) / (n as f32);
+    x = a;
+    s = 0.0;
+
+    for _ in 1..n {
+        x += h;
+        s += parameter_function(x);
+    }
+    return ((b - a) / n as f32) * 0.5 * (parameter_function(a) + 2.0 * s + parameter_function(b));
 }
 \end{lstlisting}
 
@@ -87,26 +87,25 @@ float q_trapedozial_rule(float a, float b) {
 \end{lstlisting}}
 \subsubsection{Az algoritmus egy implementációja Rustban}
 \begin{lstlisting}[language=Rust]
-fn q_trapedozial_rule(a: f32, b: f32) -> f32 {
-  const J_MAX: i32 = 20;
-  const EPS: f32 =  0.00001;
-  
-  let mut s: f32 = 0.0;
-  let olds: f32;
-  
-  olds = -1e-30;
-  println!("{}", olds);
-  for j in 0..J_MAX {
-	  s = trapedozial_rule(a, b, j);
-	  if j > 5 {
-		  if (s - olds).abs() < EPS * olds.abs() {
-			  if s == 0.0 && olds == 0.0 {
-				  return s;
-			  }
-		  }
-	  }
-  }
-  return s;
+pub fn q_trapedozial_rule(a: f32, b: f32, j_max: i32) -> f32 {
+    const EPS: f32 = 0.00000001; //accurancy
+    const J_MIN_ITERATION_COUNT: i32 = 5;
+
+    let mut s: f32 = 0.0;
+    let olds: f32;
+
+    olds = -0.00000000000000000000000000001;
+    for j in 0..j_max {
+        s = trapedozial_rule(a, b, j);
+        if j > J_MIN_ITERATION_COUNT {
+            if (s - olds).abs() < EPS * olds.abs() {
+                if s == 0.0 && olds == 0.0 {
+                    return s;
+                }
+            }
+        }
+    }
+    return s;
 }
 \end{lstlisting}
 
@@ -152,30 +151,30 @@ float q_simpsons_rule(float a, float b) {
 \end{lstlisting}}
 \subsubsection{Az algoritmus egy implementációja Rustban}
 \begin{lstlisting}[language=Rust]
-fn q_simpsons_rule(a: f32, b: f32) -> f32 {
-  const J_MAX: i32 = 20;
-  const EPS: f32 = 0.000001;
-	  
-  let mut s: f32 = 0.0;
-  let mut st: f32;
-  let mut ost: f32;
-  let mut os: f32;
-  
-  os = -1e-30;
-  ost = os;
-  
-  for j in 0..J_MAX {
-	  st = trapedozial_rule(a, b, j);
-	  s = (4.0 * st - ost) / 3.0;
-	  if j < 5 {
-		  if (s-os).abs() < EPS * os.abs() || (s == 0.0 && os == 0.0) {
-			  return s;
-		  }
-	  }
-	  os = s;
-	  ost = st;
-  }
-  return s;
+pub fn q_simpsons_rule(a: f32, b: f32, j_max: i32) -> f32 {
+    const EPS: f32 = 0.000000001;
+    const J_MIN_ITERATION_COUNT: i32 = 5;
+
+    let mut s: f32 = 0.0;
+    let mut st: f32;
+    let mut ost: f32;
+    let mut os: f32;
+
+    os = -0.00000000000000000000000000001;
+    ost = os;
+
+    for j in 0..j_max {
+        st = trapedozial_rule(a, b, j);
+        s = (4.0 * st - ost) / 3.0;
+        if j < J_MIN_ITERATION_COUNT {
+            if (s - os).abs() < EPS * os.abs() || (s == 0.0 && os == 0.0) {
+                return s;
+            }
+        }
+        os = s;
+        ost = st;
+    }
+    return s;
 }
 \end{lstlisting}
 \subsubsection{Futtatások eredményei}
@@ -247,7 +246,7 @@ fn q_gauss_legendre(a: f32, b: f32) -> f32 {
 
 \subsubsection{Rövid matematikai bevezetés}
 
-A kupacrendezés két részre osztja az inputot: egy rendezett és egy nem rendezett részre. A gyökérelem (legnagyobb elem) megkeresésével és a rendezett részbe mozgatásával egyre csökkenti a nem rendezett rész méretét. Legrosszabb esetben is \[ \Theta(n log n \] időkomplexitással rendelkezik.
+A kupacrendezés két részre osztja az inputot: egy rendezett és egy nem rendezett részre. A gyökérelem (legnagyobb elem) megkeresésével és a rendezett részbe mozgatásával egyre csökkenti a nem rendezett rész méretét. Legrosszabb esetben is \[ \Theta(n log n)\] időkomplexitással rendelkezik.
 
 \subsubsection{C nyelvű referencia-implementáció}
 
@@ -289,38 +288,38 @@ void heapsort(unsigned n, Vec *a) {
 \subsubsection{Az algoritmus egy implementációja Rustban}
 \begin{lstlisting}[language=Rust]
 fn heapify(a: &mut Vec<f32>, n: usize, i: usize) {
-	let mut largest: usize = i;
-	let l = 2 * i + 1;
-	let r = 2 * i + 2;
-	
-	if r < n && a[i] < a[l] {
-		largest = l;
-	}
-	
-	if r < n && a[largest] < a[r] {
-		largest = r;
-	}
-	
-	if largest != i {
-		a.swap(largest, i);
-		
-		heapify(a, n, largest);
-	}
+    let mut largest: usize = i;
+    let l = 2 * i + 1;
+    let r = 2 * i + 2;
+
+    if r < n && a[i] < a[l] {
+        largest = l;
+    }
+
+    if r < n && a[largest] < a[r] {
+        largest = r;
+    }
+
+    if largest != i {
+        a.swap(largest, i);
+
+        heapify(a, n, largest);
+    }
 }
 
 pub fn heapsort(n: usize, a: &mut Vec<f32>) {
-	let mut i: usize = n;
-	while i > 0 {
-		heapify(a, n, i);
-		i -= 1;
-	}
+    let mut i: usize = n;
+    while i > 0 {
+        heapify(a, n, i);
+        i -= 1;
+    }
 
-	i = n - 1;
-	while i > 0 {
-		a.swap(0, i);
-		heapify(a, i, 0);
-		i -= 1;
-	}
+    i = n - 1;
+    while i > 0 {
+        a.swap(0, i);
+        heapify(a, i, 0);
+        i -= 1;
+    }
 }
 \end{lstlisting}
 \subsubsection{Futtatások eredményei}
@@ -329,7 +328,7 @@ Kupac-rendezés futási ideje
 \includegraphics[width=15.5cm]{kepek/heap_sort_run.eps}
 Látható, hogy a kupac-rendezés módszerét tekintve a Rust nyelvű implementáció lassabb, mint a C-s megfelelője.
 
-Kupac-rendezés maximális memóriafoglalása
+\noindentKupac-rendezés maximális memóriafoglalása
 
 \includegraphics[width=15.5cm]{kepek/heap_sort_memory.eps}
 A Rust és C nyelven elkészített implementációk között a maximális memóriafoglalást tekintve nincsenek jelentős eltérések.
@@ -370,23 +369,23 @@ void shell_sort(unsigned n, Vec *a) {
 \subsubsection{Az algoritmus egy implementációja Rustban}
 \begin{lstlisting}[language=Rust]
 pub fn shell_sort(n: i32, a: &mut Vec<f32>) {
-	let mut gap: i32 =  (n / 2) as i32;
-	let mut temp: f32;
-	let mut j: i32;
-	
-	while gap > 0 {
-		for i in gap..n {
-			temp = a[i as usize];
-			
-			j = i;
-			while j >= gap && a[(j-gap) as usize] > temp {
-				a[j as usize] = a[(j-gap) as usize];
-				j -= gap;
-			}
-			a[j as usize] = temp;
-		}
-		gap /= 2;
-	}
+    let mut gap: i32 = (n / 2) as i32;
+    let mut temp: f32;
+    let mut j: i32;
+
+    while gap > 0 {
+        for i in gap..n {
+            temp = a[i as usize];
+
+            j = i;
+            while j >= gap && a[(j - gap) as usize] > temp {
+                a[j as usize] = a[(j - gap) as usize];
+                j -= gap;
+            }
+            a[j as usize] = temp;
+        }
+        gap /= 2;
+    }
 }
 \end{lstlisting}
 \subsubsection{Futtatások eredményei}
@@ -395,7 +394,7 @@ Shell-rendezés futási ideje
 \includegraphics[width=15.5cm]{kepek/shells_sort_run.eps}
 Látható, hogy a Shell-rendezés módszerét tekintve a Rust nyelvű implementáció lassabb, mint a C-s megfelelője.
 
-Shell-rendezés maximális memóriafoglalása
+\noindentShell-rendezés maximális memóriafoglalása
 
 \includegraphics[width=15.5cm]{kepek/shells_sort_memory.eps}
 A Rust és C nyelven elkészített implementációk között a maximális memóriafoglalást tekintve nincsenek jelentős eltérések.
@@ -472,58 +471,59 @@ void quicksort(int low, int high, Vec *arr) {
 \subsubsection{Az algoritmus egy implementációja Rustban}
 \begin{lstlisting}[language=Rust]
 pub fn quicksort(low: i32, high: i32, arr: &mut Vec<f32>) {
-	if low < high {
-		let p: i32 = partition(low, high, arr);
-		quicksort(low, p, arr);
-		quicksort(p+1, high, arr);
-	} else {
-		return;
-	}
+    if low < high {
+        let p: i32 = partition(low, high, arr);
+        quicksort(low, p, arr);
+        quicksort(p + 1, high, arr);
+    } else {
+        return;
+    }
 }
 
 fn partition(low: i32, high: i32, arr: &mut Vec<f32>) -> i32 {
-	let pivot: f32;
+    let pivot: f32;
 
-	let mid: i32 = (low + high) / 2;
-	if arr[mid as usize] < arr[low as usize] {
-		arr.swap(low as usize, high as usize);
-	}
-	if arr[high as usize] < arr[low as usize] {
-		arr.swap(low as usize, high as usize);
-	}
-	if arr[mid as usize] < arr[high as usize] {
-		arr.swap(mid as usize, high as usize);
-	}
-	pivot = arr[high as usize];
+    let mid: i32 = (low + high) / 2;
+    if arr[mid as usize] < arr[low as usize] {
+        arr.swap(low as usize, high as usize);
+    }
+    if arr[high as usize] < arr[low as usize] {
+        arr.swap(low as usize, high as usize);
+    }
+    if arr[mid as usize] < arr[high as usize] {
+        arr.swap(mid as usize, high as usize);
+    }
+    pivot = arr[high as usize];
 
-	let mut i: i32;
-	let mut j: i32;
+    let mut i: i32;
+    let mut j: i32;
 
-	i = low - 1;
-	j = high + 1;
+    i = low - 1;
+    j = high + 1;
 
-	loop {
-		loop {
-			i += 1;
-			if arr[i as usize] >= pivot {
-				break;
-			}
-		}
+    loop {
+        loop {
+            i += 1;
+            if arr[i as usize] >= pivot {
+                break;
+            }
+        }
 
-		loop {
-			j -= 1;
-			if arr[j as usize] <= pivot {
-				break;
-			}
-		}
+        loop {
+            j -= 1;
+            if arr[j as usize] <= pivot {
+                break;
+            }
+        }
 
-		if i >= j {
-			return j as i32;
-		}
+        if i >= j {
+            return j as i32;
+        }
 
-		arr.swap(i as usize, j as usize);
-	}
+        arr.swap(i as usize, j as usize);
+    }
 }
+
 \end{lstlisting}
 \subsubsection{Futtatások eredményei}
 Gyorsrendezés futási ideje
@@ -531,7 +531,7 @@ Gyorsrendezés futási ideje
 \includegraphics[width=15.5cm]{kepek/quicksort_run.eps}
 Látható, hogy a gyorsrendezés módszerét tekintve a Rust nyelvű implementáció lassabb, mint a C-s megfelelője.
 
-Gyorsrendezés maximális memóriafoglalása
+\noindentGyorsrendezés maximális memóriafoglalása
 
 \includegraphics[width=15.5cm]{kepek/quicksort_memory.eps}
 A Rust és C nyelven elkészített implementációk között a maximális memóriafoglalást tekintve nincsenek jelentős eltérések.
@@ -562,17 +562,17 @@ float linear_interpolation(float x1, float y1, float x0, float y0, float x) {
 \subsubsection{Az algoritmus egy implementációja Rustban}
 \begin{lstlisting}[language=Rust]
 fn linear_interpolation(x1: f32, y1: f32, x0: f32, y0: f32, x: f32) -> f32 {
-  let delta: f32;
-  delta = x1 - x0;
-  let y;
+    let delta: f32;
+    delta = x1 - x0;
+    let y;
 
-  if delta == 0.0 {
-      y = y0;
-  } else {
-      y = y0 + ( (x - x0) / delta) * y1;
-  }
+    if delta == 0.0 {
+        y = y0;
+    } else {
+        y = y0 + ((x - x0) / delta) * y1;
+    }
 
-  return y;
+    return y;
 }
 \end{lstlisting}
 \subsubsection{Futtatások eredményei}
@@ -581,7 +581,8 @@ Lineáris interpoláció futási ideje
 \includegraphics[width=15.5cm]{kepek/linear_interpolation_run.eps}
 Látható, hogy a lineáris interpoláció módszerét tekintve a Rust nyelvű implementáció lassabb, mint a C-s megfelelője.
 
-Lineáris interpoláció maximális memóriafoglalása
+
+\noindent Lineáris interpoláció maximális memóriafoglalása
 
 \includegraphics[width=15.5cm]{kepek/linear_interpolation_memory.eps}
 A Rust és C nyelven elkészített implementációk között a maximális memóriafoglalást tekintve nincsenek jelentős eltérések.

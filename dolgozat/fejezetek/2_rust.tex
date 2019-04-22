@@ -118,7 +118,7 @@ Eredetileg a C++ nyelvből eredeztethető adatstruktúra, amely a pointeren kív
 \subsection{Makrók}
 A makró, mint metaprogramozási eszköz, olyan kód, amely kódot állít elő. Ennek több előnye is van, a kevesebb kód mellett például a paraméterek száma és típusa változhat, ellentétben a függvényekkel. Ez azért történhet meg, mert a fordító a makrókat még más kódrészek előtt kibontja és ellenőrzi. Azonban használatuk bonyolultabb, és nehezebben olvashatóak.
 
-\subsubsection{deklaratív makrók}
+\subsubsection{Deklaratív makrók}
 A \lstinline{match} konstrukcióhoz hasonlító megoldás, a Rust forráskódot fordításidőben összehasonlítja a makróban megadott mintákkal, és egyezés esetén a kapott forráskódot lecseréli az adott mintához kapcsoltra. Ez fordításidőben történik, hogy a futásidő költséget csökkentse. A \lstinline{!macro_rules} konstrukcióval lehetséges makrókat definiálni Rustban. Ilyen például a standard könyvtárban lévő \lstinline{vec!} makró, melynek segítségével egy \lstinline{Vec<T>} típusú vektort tölthetünk fel a makró paramétereként tömbszerűen felsorolt elemekkel.
 
 \subsubsection{Procedurális makrók}
