@@ -401,7 +401,7 @@ A Rust és C nyelven elkészített implementációk között a maximális memór
 
 \subsection{Gyorsrendezés (Quicksort)}
 \subsubsection{Rövid matematikai bevezetés}
-A gyorsrendezés egy rekurzív algoritmus, amely az „oszd meg és uralkodj” elve alapján működik. Az input elemeket két részre osztja az alapján, hogy egy kiválasztott (pivot) elemtől kisebbek, vagy nagyobbak. Az így létrejött két részre meghívásra kerül a gyorsrendezés, egészen addig, amíg egy elemű részek nem jönnek létre. Egyetlen elem mindig rendezett. Az implementációban a Robert Sedgewick: Implementing Quicksort programs (Oct. 1978, Communications of the ACM 21 (10): 847–857) ajánlásának megfelelően kerül kiválasztásra a pivot elem, így elkerülhető a legrosszabb eset, a már rendezett elemek listája.
+A gyorsrendezés egy rekurzív algoritmus, amely az „oszd meg és uralkodj” elve alapján működik. Az input elemeket két részre osztja az alapján, hogy egy kiválasztott (pivot) elemtől kisebbek, vagy nagyobbak. Az így létrejött két részre meghívásra kerül a gyorsrendezés, egészen addig, amíg egy elemű részek nem jönnek létre. Egyetlen elem mindig rendezett. Az implementációban a Robert Sedgewick ajánlásának megfelelően kerül kiválasztásra a pivot elem, így elkerülhető a legrosszabb eset, a már rendezett elemek listája.
 
 Elméleti futásidő legjobb és átlagos esetben:
 \[\Theta(n log n) \]

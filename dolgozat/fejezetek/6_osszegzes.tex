@@ -6,13 +6,12 @@ A rendszerprogramozás mellett a webfejlesztés, és a játékprogram-fejleszté
 Népszerűsége egyre növekszik a programozók körében, azonban a Rust ökoszisztémája továbbra is nélkülözi a kifinomult fejlesztői eszközöket. Integrált fejlesztői környezet a dolgozat írásakor még nem létezik olyan minőségben, mint a régebbi programozási nyelvekhez, mint például a C, C++, C\# vagy Java esetében.
 
 Azonban hasznos tulajdonságai mellett sem elhanyagolható tény, hogy még mindig nem egy kiforrott nyelv. Látható, hogy a fájlbeolvasás a szabványos függvénykönyvtárbeli eszközökkel nagyon lassú a C-hez képest. A futási idők mérésénél például egy olyan esettel találkoztam, hogy a \lstinline{Duration} struktúrához több olyan metódus is létezik, amely az időtartam numerikus értékének kinyerésére szolgál. A mérések céljából a leginkább hasznosnak vélt \lstinline{as_float_secs} metódus, amely a másodperceket törtrészükkel együtt adja vissza, csak a \lstinline{nightly} API-val érhető el, ellenben a nanoszekundumokat, mikroszekundumokat visszaadó metódusok már a stabil API részei.
-%https://doc.rust-lang.org/std/time/struct.Duration.html#method.as_float_secs
 
 Ezen kívül vannak olyan be nem mutatott potenciáljai a Rust nyelvnek, amely a szakdolgozatnak nem témája. Ilyen például a viszonylag egyszerűen kezelhető párhuzamosság, amellyel tovább javítható a teljesítmény.
 
 A numerikus módszerek implementálása Rustban összességében nem körülményesebb feladat, mint C-ben. Az ebben a dolgozatban bemutatott módszerek esetén az alapértelmezetten immutable változókra, az ownership-szabályokra, illetve a határozottan előjel nélküli (\lstinline{usize}) egész indexekre kellett a leginkább figyelni. Ezeken a nyelvi jellemzőkön kívül az elkészült forráskód hasonló a C-s megfelelőjéhez. Bemutatásra kerültek rendezési, numerikus integrálást és lineáris interpolációt megvalósító függvények.
 
-Megjegyzendő, hogy vannak már olyan numerikus számításokra alkalmazható könyvtárak Rusthoz, amelyek jóval túlmutatnak a szakdolgozatomban bemutatott függvény-gyűjteményen, mint például a Peroxide. %https://crates.io/crates/peroxide
+Megjegyzendő, hogy vannak már olyan numerikus számításokra alkalmazható könyvtárak Rusthoz, amelyek jóval túlmutatnak a szakdolgozatomban bemutatott függvény-gyűjteményen, mint például a Peroxide.
 
 Ellenben jelenleg nem érhető el olyan széleskörű funkcionalitást nyújtó, és relatíve egyszerűen használható függvénykönyvtár numerikus problémákra, mint például az R, vagy a Python nyelvekhez.
 

@@ -4,24 +4,13 @@
 
 A Rust programozási nyelv története 2006-ban kezdődött, Graydon Hoare személyes projektjeként. A Mozilla Alapítvány (Mozilla Organization) 2009-ben csatlakozott a projekthez, amikorra már kezdtek kialakulni a nyelv jellegzetességei.
 
-%(https://web.archive.org/web/20160305231140/https://www.rust-lang.org/faq.html)
-
-A Rust továbbra is a Mozilla támogatását élvezi, de nem áll a Mozilla irányítása alatt. A projekt irányítását egy több vezető fejlesztő által alkotott csapat végzi
-
-%(https://github.com/rust-lang/rust-wiki-backup/blob/master/Note-core-team.md).
+A Rust továbbra is a Mozilla támogatását élvezi, de nem áll a Mozilla irányítása alatt. A projekt irányítását egy több vezető fejlesztő által alkotott csapat végzi.
 
 Magához a Rust programozási nyelvhez mára több, mint 2000-ren járultak hozzá.
 
-%(https://github.com/rust-lang/rust/graphs/contributors)
-
 \section{Jellemzői}
 
-%(https://web.archive.org/web/20170609052346/https://www.rust-lang.org/en-US/)
-%https://www.infoq.com/news/2012/08/Interview-Rust
-% Rust book ide vonatkozó fejezetei
-%https://github.com/rust-lang/rust
-A Rust egy nyílt forráskódú rendszerprogramozási nyelv, melynek felépítése a memóriabiztonságot és a szálbiztonságot garantáló párhuzamosságot helyezi előtérbe. A következő szakaszokban ezek megjelenési módját tekintjük át. A Rust viszonylagos „fiatalsága” következtében több már meglévő programozási nyelv felépítéséből meríthetett. Ez a fejlesztői által is elismert tény. %(https://doc.rust-lang.org/reference/influences.html)
-A nyelv eddigi története során több változtatást is megélt, az alábbiakban részletezésre kerülnek ezek a nyelvek.
+A Rust egy nyílt forráskódú rendszerprogramozási nyelv, melynek felépítése a memóriabiztonságot és a szálbiztonságot garantáló párhuzamosságot helyezi előtérbe. A következő szakaszokban ezek megjelenési módját tekintjük át. A Rust viszonylagos „fiatalsága” következtében több már meglévő programozási nyelv felépítéséből meríthetett. Ez a fejlesztői által is elismert tény. A nyelv eddigi története során több változtatást is megélt, az alábbiakban részletezésre kerülnek ezek a nyelvek.
  
 \subsection{Ownership-alapú memóriakezelés}
 
@@ -68,7 +57,6 @@ Az objektum létrehozása alatt megtörténik az erőforrás allokációja a kon
 
 \subsubsection{A move és a copy művelet}
 Ha két változó ugyanarra az értékre mutat a memóriában, akkor a későbbi hivatkozás érvényteleníti a korábbi referenciát. Ilyen módon később nem jöhet létre dupla felszabadítási hiba (\textit{double free error}), ami ugyanazon memóriaterület kétszeri felszabadítását jelenti. Ez a megoldás hasonlít más programozási nyelvekben megtalálható \textit{shallow copy} megoldásra, amellyel szemben Rustban különbség, hogy a shallow copy a pointer és a mutatott memóriaterület méretére vonatkozó adatok csak átmásolódnak az új változóba, a Rust viszont érvényteleníti is az ilyen módon „helyettesített” változót. Ennek a működésnek a következménye pedig, hogy a Rust automatikusan soha nem hoz létre \textit{deep copy}t sem (ami magát a mutatott adat másolását jelentené). Ellenben megegyező funkcionalitás elérhető a \lstinline{clone} metódus explicit hívásával. A Rust a \lstinline{Copy} traitet alkalmazza a stackben tárolt értékre mutató típusokra. A \lstinline{Copy} traitet implementáló típusoknak a \lstinline{Drop} traitet is implementálniuk kell. Alapvetően az egész és a lebegőpontos számok, logikai értékek, illetve az ezekből álló tuple adatszerkezetek rendelkeznek a \lstinline{Copy} traittel. A memóriakezelés más jellemzőihez hasonlóan, a Rustban a move művelet esetében a C++-os hatás figyelhető meg.
-%https://en.cppreference.com/w/cpp/utility/move
 \begin{lstlisting}[language=Rust, style=boxed]
     let original_vector: Vec<i32> = vec![1, 2, 3, 4, 5];
     let new_vector = original_vector;
@@ -78,7 +66,7 @@ Fordításkor hibára vezet, mert a vektorra, amelyre eredetileg az \lstinline{o
 
 \subsubsection{Mutability}
 Rustban alapértelmezés szerint minden változó immutable, azaz csak egyszer rendelhető hozzájuk érték. Ez egyszerűbbé teszi a többszálú programok fejlesztését, ugyanis így minden szál számára garantálható, hogy a változó értéke nem fog megváltozni. Nem keverendő össze a konstansokkal, amelyeket a \texttt{const} kulcsszó használatával deklarálhatunk Rustban a \texttt{let} helyett. Utóbbiak mindenképpen immutable változók (nem csak alapértelmezetten) és az értékadó utasításukban is csak konstans kifejezések szerepelhetnek, továbbá minden esetben el kell látni típus annotációval őket. A konstansok névkonvenció szerint mind nagybetűsök, alulvonással (\lstinline{_}) elválasztva az esetleges összetett azonosítókat.
-% https://doc.rust-lang.org/book/ch03-01-variables-and-mutability.html
+
 Ha megpróbálnánk egy immutable változóhoz egynél többször is értéket adni, például:
 \begin{lstlisting}[language=Rust, style=boxed]
 let v = 0;
@@ -108,12 +96,9 @@ A Rust egy statikusan típusos nyelv, tehát a változók típusának fordítás
   let y = x + 2;
 \end{lstlisting}
 A kódrészlet lefordul, mert a fordítóprogram az \lstinline{x} változó típusát ismeri (\lstinline{i32}), a (\lstinline{2}) pedig, mint szám literál, gyakorlatilag bármilyen numerikus típusnak megfelelő érték lehet (nem veszít ugyanis a pontosságából), ezért a fordító \lstinline{i32}-ként kezeli, és két \lstinline{i32} változó értéke szintén egy \lstinline{i32} típusú szám lesz.
-%https://ocaml.org/learn/tutorials/basics.html#Type-inference
-%https://smlnj.org/doc/Conversion/types.html
 
 \subsubsection{Smart pointerek}
 Eredetileg a C++ nyelvből eredeztethető adatstruktúra, amely a pointeren kívül más metaadatokat is tárol.
-%https://doc.rust-lang.org/book/ch15-00-smart-pointers.html
 
 \subsection{Makrók}
 A makró, mint metaprogramozási eszköz, olyan kód, amely kódot állít elő. Ennek több előnye is van, a kevesebb kód mellett például a paraméterek száma és típusa változhat, ellentétben a függvényekkel. Ez azért történhet meg, mert a fordító a makrókat még más kódrészek előtt kibontja és ellenőrzi. Azonban használatuk bonyolultabb, és nehezebben olvashatóak.
@@ -128,11 +113,9 @@ A procedurális makrók tulajdonképpen függvények, amelyek Rust forráskódot
   pub fn procedural_macro_example(input: TokenStream) -> TokenStream {
 }
 \end{lstlisting}
-%https://doc.rust-lang.org/book/ch19-06-macros.html
 
 \subsection{Trait-alapú generikusok}
 A traitek által megvalósítható a Haskell nyelvben megtalálható típusosztályokra hasonlító konstrukciók. Lényege, hogy több különböző adattípus hasonlóságát mutató tulajdonságot, trait-et az összes hasonló típusra (tehát a típusosztályra) meg kell valósítani, amelyek aztán hasonló módon használhatóak minden típus esetén. Az egyes adattípusok trait-implementáció persze különbözhetnek egymástól.
-% https://www.haskell.org/tutorial/classes.html
 
 Rustban az \lstinline{enum}ok a funkcionális programozási nyelvek algebrai adattípusaira hasonlít, mint az OCaml, vagy a Haskell.
 \begin{lstlisting}[language=Rust, style=boxed]
@@ -147,8 +130,6 @@ enum Day {
 }
 \end{lstlisting}
 Az \lstinline{enum} definíciója után a névterével azonosítva használható: \lstinline{let day = Day::Monday}.
-% https://doc.rust-lang.org/book/ch06-00-enums.html
-%https://wiki.haskell.org/Algebraic_data_type
 
 \subsection{Mintaillesztés}
 Mintaillesztéssel ellenőrzi a \lstinline{match}ben lévő mintát (patternt) sorrendben a karokon, és az illeszkedő karon (arm) folytatja a futtatást. Ha nincs tovább gyerek, végrehajtja az utasítást. A \lstinline{match} vezérlési szerkezettel jól olvasható kód hozható létre, különsen \lstinline{enum}okkal együtt alkalmazva. Ha nem akarjuk az összes lehetséges esetet lekezelni, akkor az \lstinline{_} operátor használható, ami egy olyan mintát jelöl, amelyre minden illeszkedik. Hasonlít más nyelvekben megtalható \lstinline{switch} elágazásokra, azonban itt az egyes ágakról nem „folyik át” a végrehajtás az explicit \lstinline{break} utasítás kiadása nélkül.
@@ -158,8 +139,6 @@ match day {
   Day::Sunday => println!("Last Day of the Week"),
 }
 \end{lstlisting}
-% https://doc.rust-lang.org/book/ch06-02-match.html
-%/https://ocaml.org/learn/tutorials/data_types_and_matching.html
 
 \subsection{Optional bindings}
 A Swift nyelvben egy optional binding segítségével ellenőrizhető, hogy egy optional tartalmaz-e értéket, ha igen, akkor az értéke felhasználható egy ideiglenes konstansként, vagy változóként, ekkor végrehajthatók tetszőleges feltételes utasítások. %(https://docs.swift.org/swift-book/LanguageGuide/TheBasics.html)
@@ -203,8 +182,7 @@ fn test_foo() {
 \end{lstlisting}
 Megjegyzés: ez az attribútum megjelöli a test\_foo függvényt egységtesztként (unit test).
 
-\subsection{Unicode Annex \#31 (identifier és minta szintaxis)}
-%http://www.unicode.org/reports/tr31/
+\subsection{Unicode Annex \#31 (azonosító és minta szintaxis)}
 
 \subsection{Korábbi hatások}
 A Rust nyelv 2006 óta többször megváltozott, vannak olyan nyelvek, melyek hatása korábban érvényesült a nyelvben, de azóta ezeket a megoldásokat részben, vagy teljesen átdolgozták, a korábbi hatás nem azonosítható. Ilyen a Ruby nyelv blokk-szintaxisa, valamint a NIL és Hermes nyelvekre jellemző typestate.
@@ -212,18 +190,6 @@ A Rust nyelv 2006 óta többször megváltozott, vannak olyan nyelvek, melyek ha
 Vannak olyan eset is, amikor egy nyelv jelentősebb hatással volt a Rustra, de néhány jellemző már megváltozott és mostanra már nem hasonlítanak az adott téren a nyelvek. Ide sorolható az Erlang linked thread failure és lightweight concurrency.
 
 \section{Támogatottsága}
-A Rust egy egyre népszerűbb, a GitHub felmérése szerint %(https://octoverse.github.com/projects.html, 2019.02.06)
-az ötödik leggyorsabban növekvő népszerűségű programozási nyelv a GitHubon tárolt kódokat tekintve. A TIOBE-index szerint %https://www.tiobe.com/tiobe-index/
-2019. márciusában a 35. legnépszerűbb programozási nyelv.
+A Rust egy egyre népszerűbb, a GitHub felmérése szerint az ötödik leggyorsabban növekvő népszerűségű programozási nyelv a GitHubon tárolt kódokat tekintve. A TIOBE-index szerint 2019. márciusában a 35. legnépszerűbb programozási nyelv.
 
-Egyre több területen láthatunk példákat a használatára: a Mozilla Firefox webböngésző Servo komponensén teljes átírásra került Rustban
-%https://servo.org/
-, ami a teljesítményen is látható javulást hozott. %citation needed
-, már (POSIX-kompatibilis) operációs rendszer (Redux OS), fájlrendszerek, beágyazott rendszerek, parancssoros eszközök (CLI tools) %https://github.com/BurntSushi/ripgrep
-%https://github.com/sharkdp/fd
-%https://github.com/chmln/sd
-, virtuális valóságot működtető szimulációs motorok létrehozására, webes keretrenszerek megvalósítására is találunk példákat. %https://github.com/actix/actix-web
-játékprogramokhoz %%https://www.amethyst.rs/
-%https://www.piston.rs/
-Ezen kívül fejlesztés alatt áll Python-interpreter %(https://github.com/RustPython/RustPython),  
-keresztplatformos, GPU-gyorsított terminál emulátor: %https://github.com/jwilm/alacritty 
+Egyre több területen láthatunk példákat a használatára: a Mozilla Firefox webböngésző Servo komponensén teljes átírásra került Rustban, ami a teljesítményen is javulást hozott. Készült már (POSIX-kompatibilis) operációs rendszer (Redux OS), fájlrendszerek, beágyazott rendszerek, parancssoros eszközök (CLI tools), virtuális valóságot működtető szimulációs motorok, webes keretrendszerek, játékprogramokhoz használt grafikus motorok.
