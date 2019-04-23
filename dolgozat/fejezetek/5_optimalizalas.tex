@@ -17,7 +17,6 @@ A grafikonon látható, hogy Rustban a beolvasás jóval lassabb, a futásidők 
 Látható, hogy maga a módszer a Rust implementációban minden esetben gyorsabb, ha az inputfájlok beolvasásást nem mérjük.
 
 \section{Technikai részletek}
-% Technikai részletek bemutatása, ami alapján a számítási teljesítmény jobb-rosszabb lehet, mint C esetében.
 Lebegőpontos számok ábrázolását a Rust az IEEE-754-es szabványnak megfelelően végzni. Az egyszeres pontosságú lebegőpontos számokat az \lstinline{f32}, a dupla pontosságú lebegőpontos számokat pedig az \lstinline{f64} típusok szolgáltatják. C-ben ez nincs specifikálva, de általában az IEEE szabványát követi. Az egyszeres pontosságú a \lstinline{float}, a dupla pontosságú lebegőpontos szám a \lstinline{double} típussal reprezentálható.
 %https://doc.rust-lang.org/book/ch03-02-data-types.html
 
