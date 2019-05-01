@@ -1,11 +1,11 @@
 \Chapter{Összegzés}
-A dolgozatom alapján belátható, hogy a Rust programozási nyelvként egy ígéretes kezdeményezés, ami a teljesítményt illetően összehasonlítható a hasonló okból megbecsült C/C++ nyelvekkel. A nem is feltétlenül egyedi, de jól átgondolt nyelvi elemeinek köszönhetően a legtöbb hiba fordításidőben kiderül, ami nagy segítség a Rust nyelven programozók számára.
+A dolgozatom alapján belátható, hogy a Rust programozási nyelvként egy ígéretes kezdeményezés, ami a teljesítményt illetően összehasonlítható a hasonló okból megbecsült C/C++ nyelvekkel. A nem is feltétlenül egyedi, de jól átgondolt nyelvi elemeinek köszönhetően a legtöbb hiba fordítás időben kiderül, ami nagy segítség a Rust nyelven programozók számára.
 
 A rendszerprogramozás mellett a webfejlesztés, és a játékprogram-fejlesztés területe mellet már operációs rendszert is fejlesztenek vele.
 
 Népszerűsége egyre növekszik a programozók körében, azonban a Rust ökoszisztémája továbbra is nélkülözi a kifinomult fejlesztői eszközöket. Integrált fejlesztői környezet a dolgozat írásakor még nem létezik olyan minőségben, mint a régebbi programozási nyelvekhez, mint például a C, C++, C\# vagy Java esetében.
 
-Azonban hasznos tulajdonságai mellett sem elhanyagolható tény, hogy még mindig nem egy kiforrott nyelv. Látható, hogy a fájlbeolvasás a szabványos függvénykönyvtárbeli eszközökkel nagyon lassú a C-hez képest. A futási idők mérésénél például egy olyan esettel találkoztam, hogy a \lstinline{Duration} struktúrához több olyan metódus is létezik, amely az időtartam numerikus értékének kinyerésére szolgál. A mérések céljából a leginkább hasznosnak vélt \lstinline{as_float_secs} metódus, amely a másodperceket törtrészükkel együtt adja vissza, csak a \lstinline{nightly} API-val érhető el, ellenben a nanoszekundumokat, mikroszekundumokat visszaadó metódusok már a stabil API részei.
+Azonban hasznos tulajdonságai mellett sem elhanyagolható tény, hogy még mindig nem egy kiforrott nyelv. Látható, hogy a fájl-beolvasás a szabványos függvénykönyvtárbeli eszközökkel nagyon lassú a C-hez képest. A futási idők mérésénél például egy olyan esettel találkoztam, hogy a \lstinline{Duration} struktúrához több olyan metódus is létezik, amely az időtartam numerikus értékének kinyerésére szolgál. A mérések céljából a leginkább hasznosnak vélt \lstinline{as_float_secs} metódus, amely a másodperceket törtrészükkel együtt adja vissza, csak a \lstinline{nightly} API-val érhető el, ellenben a nanoszekundumokat, mikroszekundumokat visszaadó metódusok már a stabil API részei.
 
 Ezen kívül vannak olyan be nem mutatott potenciáljai a Rust nyelvnek, amely a szakdolgozatnak nem témája. Ilyen például a viszonylag egyszerűen kezelhető párhuzamosság, amellyel tovább javítható a teljesítmény.
 

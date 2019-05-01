@@ -10,7 +10,7 @@ A méréseket minden rendezési módszer esetén megegyező méretű bemenettel,
 
 A numerikus integrálás algoritmusok esetén az \[ F(x) = \int_0^{40} x^2 - 1 \] függvény görbe alatti területét közelítettem a \[\left[0, 40\right]\]-on mind az iteratív trapézszabály, mind az iteratív Simpson-formula esetén.
 
-A lineáris interpoláció teljesítményméresihez 7 ismert érték közötti, véletlenszerűen generált lebegőpontos számnak megfelelő helyen számítottam köztes értékeket.
+A lineáris interpoláció teljesítményméreseihez 7 ismert érték közötti, véletlenszerűen generált lebegőpontos számnak megfelelő helyen számítottam köztes értékeket.
 
 \section{Tervek, észrevételek a mérésekhez}
 
@@ -18,4 +18,4 @@ A méréseket egy Intel i5-4200U processzorral és 8 GB memóriát használó sz
 
 Rustból az 1.33-as verziót (\lstinline{2aa4c46cf 2019-02-28}), C-ből a C18-as szabványt használtam.
 
-A C nyelvű implementáció esetén a \lstinline{gcc} fordítóprogram az optimális, \lstinline{-O3} paraméterrel került meghívásra. A Rust nyelvű megoldás esetén pedig a \lstinline{rustc} fordítóprogram a Rust nyelvhez tartozó \lstinline{cargo} csomagkezelő \lstinline{build} paranccsa által hívódik meg. Az általam használt parancs a \lstinline{cargo build --release}, amely alkalmazza a \lstinline{rustc} fordító által kínált legjobb hatásfokú optimalizálási megoldásokat, konkrétan az \lstinline{rustc -C --opt-level=3} parancs kerül meghívásra.
+A C nyelvű implementáció esetén a \lstinline{gcc} és a \lstinline{Clang} fordítóprogram is az optimális, \lstinline{-O3} paraméterrel került meghívásra. A Rust nyelvű megoldás esetén pedig a \lstinline{rustc} fordítóprogram a Rust nyelvhez tartozó \lstinline{cargo} csomagkezelő \lstinline{build} paranccsa által hívódik meg. Az általam használt parancs a \lstinline{cargo build --release}, amely alkalmazza a \lstinline{rustc} fordító által kínált legjobb hatásfokú optimalizálási megoldásokat, konkrétan az \lstinline{rustc -C --opt-level=3} parancs kerül meghívásra.

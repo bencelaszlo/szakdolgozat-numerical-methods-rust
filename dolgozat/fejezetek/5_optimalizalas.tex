@@ -14,13 +14,13 @@ A grafikonon látható, hogy Rustban a beolvasás jóval lassabb, a futásidők 
 \includegraphics[width=15.5cm]{kepek/quicksort_run_without_read.eps}
 \subsubsection{Lineáris interpoláció}
 \includegraphics[width=15.5cm]{kepek/linear_interpolation_run_without_read.eps}
-Látható, hogy maga a módszer a Rust implementációban minden esetben gyorsabb, ha az inputfájlok beolvasásást nem mérjük.
+Látható, hogy maga a módszer a Rust implementációban minden esetben gyorsabb, ha az inputfájlok beolvasását nem mérjük.
 
 \section{Technikai részletek}
-Lebegőpontos számok ábrázolását a Rust az IEEE-754-es szabványnak megfelelően végzni. Az egyszeres pontosságú lebegőpontos számokat az \lstinline{f32}, a dupla pontosságú lebegőpontos számokat pedig az \lstinline{f64} típusok szolgáltatják. C-ben ez nincs specifikálva, de általában az IEEE szabványát követi. Az egyszeres pontosságú a \lstinline{float}, a dupla pontosságú lebegőpontos szám a \lstinline{double} típussal reprezentálható.
+Lebegőpontos számok ábrázolását a Rust az IEEE-754-es szabványnak megfelelően végzi. Az egyszeres pontosságú lebegőpontos számokat az \lstinline{f32}, a dupla pontosságú lebegőpontos számokat pedig az \lstinline{f64} típusok szolgáltatják. C-ben ez nincs specifikálva, de általában az IEEE szabványát követi. Az egyszeres pontosságú a \lstinline{float}, a dupla pontosságú lebegőpontos szám a \lstinline{double} típussal reprezentálható.
 %https://doc.rust-lang.org/book/ch03-02-data-types.html
 
-A Rust nyelven implementált rendezési eljárások esetén a beépített \lstinline{Vec} adatszerkezetet használtam, melynek működéséhez hasonló saját típust definiáltam C-ben is. Ugyanakkor megemlítendő, hogy a C-s \lstinline{Vec} típus nem implementálja a Rustban meglévő vektortípus által implementált összes metódust, csak azt azokat, amelyek a dolgozatban bemutatott módszerek által használtak.
+A Rust nyelven implementált rendezési eljárások esetén a beépített \lstinline{Vec} adatszerkezetet használtam, melynek működéséhez hasonló saját típust definiáltam C-ben is. Ugyanakkor megemlítendő, hogy a C-s \lstinline{Vec} típus nem implementálja a Rustban meglévő vektor típus által implementált összes metódust, csak azt azokat, amelyek a dolgozatban bemutatott módszerek által használtak.
 %https://doc.rust-lang.org/stable/nomicon/vec-alloc.html
 \cppstyle{\begin{lstlisting}[language=c++]
 typedef struct Vec {
