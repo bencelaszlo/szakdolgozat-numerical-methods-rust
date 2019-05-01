@@ -1,5 +1,5 @@
 \Chapter{Mérések}
-% TODO: Binárisok méretének mérése, az erre a feladatra használatos optimalizálási kapcsolókkal.
+
 \section{Numerikus integrálás}
 
 \subsection{Trapézszabály}
@@ -12,7 +12,7 @@ A trapézszabály határozott integrálok meghatározására alkalmas közelít�
 \]
 
 \subsubsection{C nyelvű referencia-implementáció}
-
+A függvény \lstinline{parameter_function}-t használja egy függvényérték kiszámításához egy adott \lstinline{x} pontban.
 \cppstyle{\begin{lstlisting}[language=c++]
 float trapedozial_rule(float a, float b, int n) {
     float x;
@@ -33,7 +33,7 @@ float trapedozial_rule(float a, float b, int n) {
 \end{lstlisting}}
 
 \subsubsection{Az algoritmus egy implementációja Rustban}
-
+A Rust nyelvű implementáció nagyon hasonló, a megfigyelhető különbségek a mutable és immutable változók elkülönítése, illetve az \lstinline{n} változó típusának explicit castolása \lstinline{f32}-ként az osztás elvégzéséhez. A Rust nem végez automatikus típuskonverziót.
 \begin{lstlisting}[language=Rust, style=boxed]
 pub fn trapedozial_rule(a: f32, b: f32, n: i32) -> f32 {
     let mut x: f32;
@@ -52,8 +52,6 @@ pub fn trapedozial_rule(a: f32, b: f32, n: i32) -> f32 {
 }
 \end{lstlisting}
 
-\subsubsection{Futtatások eredményei}
-
 \subsection{Iteratív trapézszabály}
 
 \subsubsection{Rövid matematikai bevezetés}
@@ -61,22 +59,21 @@ pub fn trapedozial_rule(a: f32, b: f32, n: i32) -> f32 {
 Az iteratív trapézszabály a trapézszabályra épül. Lényege, hogy a függvénygörbe alatti területre illesztett trapézok számát iteratívan növeli, így minden iterációban egyre jobb közelítést ad. A számítógép implementációk esetén ez a finomítási folyamat akkor áll meg, amikor az elmúlt iterációban nem változott jelentősen a közelítés értéke.
 
 \subsubsection{C nyelvű referencia-implementáció}
-
+A C nyelvű implementációban az iterációk maximális számát az \lstinline{jmax} paraméter szabályozza. Visszatér, ha az előző két iterációban kapott értékek között nincs \lstinline{EPS}-től nagyobb eltérés.
 \cppstyle{\begin{lstlisting}[language=c++]
-float q_trapedozial_rule(float a, float b) {
-    const int J_MAX = 20;
-    const float EPS = 0.00001;
+float q_trapedozial_rule(float a, float b, int j_max) {
+    const float EPS = 0.00000001;
+    const int J_MIN_ITERATION_COUNT = 5;
 
     float s = 0.0;
-    float olds = -1e-30;
-    
-    int j;
+    float olds;
 
-    for (j = 0; j < J_MAX; j++) {
+    olds = -0.00000000000000000000000000001;
+    for (int j = 0; j < j_max; j++) {
         s = trapedozial_rule(a, b, j);
-        if (j < 5) {
-            if (abs(s - olds) < EPS * abs(olds)) {
-                if ( (s == 0.0) && (olds == 0.0)) {
+        if (j > J_MIN_ITERATION_COUNT) {
+            if (abs_float(s - olds) < EPS * abs_float(olds) ) {
+                if ( (s == 0.0) && (olds == 0.0) ) {
                     return s;
                 }
             }
@@ -86,9 +83,10 @@ float q_trapedozial_rule(float a, float b) {
 }
 \end{lstlisting}}
 \subsubsection{Az algoritmus egy implementációja Rustban}
+Az algoritmus implementációja hasonló Rustban is, mindösszesen az olyan szintaktikai különbségek vannak, mint a zárójelezés elhagyása a \lstinline{for} és az \lstinline{if} szerkezetekben. Egyébiránt teljesen megegyező módon működik.
 \begin{lstlisting}[language=Rust]
 pub fn q_trapedozial_rule(a: f32, b: f32, j_max: i32) -> f32 {
-    const EPS: f32 = 0.00000001; //accurancy
+    const EPS: f32 = 0.00000001;
     const J_MIN_ITERATION_COUNT: i32 = 5;
 
     let mut s: f32 = 0.0;
@@ -120,26 +118,25 @@ pub fn q_trapedozial_rule(a: f32, b: f32, j_max: i32) -> f32 {
 A Simpson-módszer a trapézszabályon alapul úgy, hogy a részintervallumok végpontjaihoz súlyokat rendel. Az iteratív Simpson-módszer a Simpson-módszerre alapul, az iteratív trapézszabályhoz hasonlóan finomítja egyre jobban a közelítést minden iterációban.
 
 \subsubsection{C nyelvű referencia-implementáció}
-
+A Simpson-módszer implementációja hasonló az iteratív trapézszabályékhoz, a különbséget a közelítő érték kiszámításához használatos formula jelenti.
 \cppstyle{\begin{lstlisting}[language=c++]
-float q_simpsons_rule(float a, float b) {
-    const int J_MAX = 20;
-    const float EPS = 0.00001;
+float q_simpsons_rule(float a, float b, int j_max) {
+    const float EPS = 0.00000001;
+    const int J_MIN_ITERATION_COUNT = 5;
 
     float s = 0.0;
     float st;
     float ost;
     float os;
-    int j;
 
-    os = -1e-30;
+    os = -0.00000000000000000000000000001;
     ost = os;
 
-    for (j = 0; j < J_MAX; j++) {
+    for (int j = 0; j < j_max; j++) {
         st = trapedozial_rule(a, b, j);
         s = (4.0 * st - ost) / 3.0;
-        if (j < 5) {
-            if (abs(s - os) < EPS * abs(os) || (s == 0.0 && os == 0.0) ) {
+        if (j > J_MIN_ITERATION_COUNT) {
+            if (abs_float(s - os) < EPS * abs_float(os) || (s == 0.0 && os == 0.0) ) {
                 return s;
             }
         }
@@ -150,6 +147,7 @@ float q_simpsons_rule(float a, float b) {
 }
 \end{lstlisting}}
 \subsubsection{Az algoritmus egy implementációja Rustban}
+Az algoritmus Rust nyelvű implementációja, jelentős különbségek ebben az esetben sincsenek.
 \begin{lstlisting}[language=Rust]
 pub fn q_simpsons_rule(a: f32, b: f32, j_max: i32) -> f32 {
     const EPS: f32 = 0.000000001;
@@ -166,7 +164,7 @@ pub fn q_simpsons_rule(a: f32, b: f32, j_max: i32) -> f32 {
     for j in 0..j_max {
         st = trapedozial_rule(a, b, j);
         s = (4.0 * st - ost) / 3.0;
-        if j < J_MIN_ITERATION_COUNT {
+        if j > J_MIN_ITERATION_COUNT {
             if (s - os).abs() < EPS * os.abs() || (s == 0.0 && os == 0.0) {
                 return s;
             }
@@ -286,6 +284,7 @@ void heapsort(unsigned n, Vec *a) {
 }
 \end{lstlisting}}
 \subsubsection{Az algoritmus egy implementációja Rustban}
+Kiemelendő részlet, hogy a Rust nyelvű implementációban a \lstinline{Vec} típus \lstinline{swap} metódusa került felhasználásra a vektor két elemének megcseréléséhez.
 \begin{lstlisting}[language=Rust]
 fn heapify(a: &mut Vec<f32>, n: usize, i: usize) {
     let mut largest: usize = i;
@@ -344,6 +343,7 @@ Az egymástól távoli elemek összehasonlításával kezdi a rendezést, majd a
 \[\Theta(n^2)\]
 
 \subsubsection{C nyelvű referencia-implementáció}
+
 \cppstyle{\begin{lstlisting}[language=c++]
 void shell_sort(unsigned n, Vec *a) {
     int gap = (n / 2);
@@ -544,6 +544,7 @@ A lineáris interpoláció két ismert pont közötti összefüggést egyenes ar
 \[ y_n = \frac{x_n - x_1}{x_2 - x_1} * (y_2 - y_1) + y_1 \]
 Ahol $x_1 \neq x_2$.
 \subsubsection{C nyelvű referencia-implementáció}
+A lineáris interpoláció implementációja egyszerű. Ha a paraméterként kapott két pont \lstinline{x} értékei megegyeznek, akkor az első pont \lstinline{y} értékével tér vissza.
 \cppstyle{\begin{lstlisting}[language=c++]
 float linear_interpolation(float x1, float y1, float x0, float y0, float x) {
     float delta;
@@ -560,6 +561,7 @@ float linear_interpolation(float x1, float y1, float x0, float y0, float x) {
 }
 \end{lstlisting}}
 \subsubsection{Az algoritmus egy implementációja Rustban}
+A Rust nyelvű implementáció nem mutat az esetleges szintaktikai különbözőségeken felül más eltérést a C nyelvűtől.
 \begin{lstlisting}[language=Rust]
 fn linear_interpolation(x1: f32, y1: f32, x0: f32, y0: f32, x: f32) -> f32 {
     let delta: f32;
