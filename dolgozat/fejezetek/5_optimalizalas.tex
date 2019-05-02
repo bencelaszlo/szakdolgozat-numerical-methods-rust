@@ -5,15 +5,21 @@ Azoknál a módszereknél, amelyek mért futásidejében jelentős különbség 
 
 \includegraphics[width=15.5cm]{kepek/file_read.eps}
 A grafikonon látható, hogy Rustban a beolvasás jóval lassabb, a futásidők különbségét magyarázza.
+
 \subsection{Futásidők a fájl beolvasása nélkül}
+
 \subsubsection{Kupacrendezés}
 \includegraphics[width=15.5cm]{kepek/heap_sort_run_without_read.eps}
+
 \subsubsection{Shell-rendezés}
 \includegraphics[width=15.5cm]{kepek/shells_sort_run_without_read.eps}
+
 \subsubsection{Gyorsrendezés}
 \includegraphics[width=15.5cm]{kepek/quicksort_run_without_read.eps}
+
 \subsubsection{Lineáris interpoláció}
 \includegraphics[width=15.5cm]{kepek/linear_interpolation_run_without_read.eps}
+
 Látható, hogy maga a módszer a Rust implementációban minden esetben gyorsabb, ha az inputfájlok beolvasását nem mérjük.
 
 \section{Technikai részletek}
