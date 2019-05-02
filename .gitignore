@@ -14,6 +14,7 @@
 *.xdv
 dolgozat.pdf
 dolgozat/cimlap/ME_logo-eps-converted-to.pdf
+dolgozat/kepek/*-eps-converted-to.pdf
 
 # Build tool auxiliary files
 *.synctex.gz
