@@ -1,18 +1,96 @@
-\Chapter{Numerikus módszerek}
+\Chapter{Mérési módszerek}
 
-\section{Mérési módszerek áttekintése}
+\Section{A futási idő mérése}
 
-A futási idő, illetve a memóriahasználat méréséhez a szabad szoftver GNU Time program került felhasználásra. A GNU Time parancs az \lstinline{-f} paraméterrel tetszőleges, formázott kimenetet ad. A mérésekhez a szakdolgozatban a következő módon használtam: \lstinline{time -f %E_%P_%M}, ahol az \lstinline{%E} az eltelt valós időt (óra:perc:másodperc formátumban), a \lstinline{%P} a program (\textit{job}) által ténylegesen felhasznált processzoridő arányát (beleértve a felhasználói módban és a kernel módban felhasznált időt is) az eltelt időhöz (százalékos arányban), az \lstinline{%M} pedig a processz életideje alatt felhasznált maximális memóriaméretet jelenti (kilobyte-okban).
+A futási idő, illetve a memóriahasználat méréséhez a szabad szoftver GNU Time program került felhasználásra \cite{gnutime}. A GNU Time parancs az \lstinline{-f} paraméterrel tetszőleges, formázott kimenetet ad. A mérésekhez a szakdolgozatban a következő módon használtam: \lstinline{time -f %E_%P_%M}, ahol az \lstinline{%E} az eltelt valós időt (óra:perc:másodperc formátumban), a \lstinline{%P} a program (\textit{job}) által ténylegesen felhasznált processzoridő arányát (beleértve a felhasználói módban és a kernel módban felhasznált időt is) az eltelt időhöz (százalékos arányban), az \lstinline{%M} pedig a processz életideje alatt felhasznált maximális memóriaméretet jelenti (kilobyte-okban).
 
-Rustban, a forráskódba ágyazott időmérést a \texttt{coarsetime} nevű függvénykönyvtárral végeztem.
+Rustban, a forráskódba ágyazott időmérést a \texttt{coarsetime} nevű függvénykönyvtárral végeztem \cite{coarsetime}.
 
 A méréseket minden rendezési módszer esetén megegyező méretű bemenettel, illetve ugyanazokkal a véletlenszerűen generált lebegőpontos számokkal végeztem mind a C, mind a Rust nyelvű implementációk esetén.
 
-A numerikus integrálás algoritmusok esetén az \[ F(x) = \int_0^{40} x^2 - 1 \] függvény görbe alatti területét közelítettem a \[\left[0, 40\right]\]-on mind az iteratív trapézszabály, mind az iteratív Simpson-formula esetén.
+A numerikus integrálás algoritmusok esetén az \(f(x) = x^2 - 1\) függvény \(\left[0, 40\right]\) intervallumon vett görbe alatti területét közelítettem, tehát a
+\[ F(x) = \int_0^{40} \! x^2 - 1 \; \mathrm{d}x\]
+határozott integrál értékét, mind az iteratív trapézszabály, mind az iteratív Simpson-formula esetén.
 
 A lineáris interpoláció teljesítményméreseihez 7 ismert érték közötti, véletlenszerűen generált lebegőpontos számnak megfelelő helyen számítottam köztes értékeket.
 
-\section{Tervek, észrevételek a mérésekhez}
+\Section{Számítási hatékonyság vizsgálata C++ esetén}
+
+Egy elterjedt nézet, hogy C programozási nyelven a C++ programokénál hatékonyabb programkódot lehet fejleszteni. E mellett és ellen is szólnak érvek, amelyek az alábbi pontokban foglalhatók össze.
+\begin{itemize}
+\item Bizonyos esetekben nehéz a C és C++ nyelveket elkülöníteni, mivel a C++ részhalmazként tartalmazza a C nyelvet \cite{cppreference}. Bjarne Stroustrup, a nyelv kifejlesztője igyekezett a C-beli hiányosságokat pótolni, és magasabb absztrakció szintű, objektum orientált paradigma szerinti programozást lehetővé tenni. Mindvégig szempontként szerepelt a C-vel (és korábbi C++ verizókkal) való visszafele kompatibilitás megtartása. Így egy C++ programban tetszés szerint használhatunk C programnyelvi elemeket. Bizonyos esetekben inkább csak konvenciók jelzik azt, hogy melyik programozási nyelvben készült a program, mivel maga a nyelv kitalálója is úgy vélekedett a C++ nyelvről, hogy az rengeteg eszközt biztosít, amelyekből mindenki annyit használ amennyit az adott feladat elvégzéséhez szükségesnek tart. Teljesítményösszehasonlítás szempontjából tehát mondhatnánk azt, hogy elegendő a C-vel összevetni a számítási teljesítményt, mivel az így szükségszerűen nem lehet rosszabb.
+\item A C++ egy jóval bonyolultabb programozási nyelv, mint a C. Ebből kifolyólag a hozzá készített fordítóprogramnak is jóval komplexebbnek kell lennie. Elvileg megtehetnénk, hogy csak C++ fordítót használnánk, és annak adnánk meg, hogy melyik C szabvány szerint szeretnénk lefordítani a kódot, viszont ez hosszabb fordítási időket eredményezne. Így tehát ebben az esetben is külön figyelmet kell fordítanunk a fordítóra, vagyis az összehasonlítás szempontjából külön kezelhetjük a C és C++ fordítókat. Annak köszönhetően, hogy sem a fordítási időkben való eltérés, sem pedig a fejlesztőeszköz mérete tipikusan nem jelent problémát manapság, ezért ez sem szükségszerű, hogy a vizsgálatoknál külön szempontként szerepeljen.
+\item A C++ számos olyan adatszerkezetet és algoritmust támogat, amelyet a C nem. A szabványos sablon könyvtárban (\textit{Standard Template Library}) találhatóak azok a tárolók és gyakran előforduló algoritmusokat, amelyeket a függvénykönyvtár elérhetővé teszt. A számítási teljesítmény összehasonlításánál fontos tehát azt is figyelembe venni, hogy milyen adatszerkezetet és hogyan használunk. A további összehasonlítások érdekében ezért ezek vizsgálatára érdemes kitérni.
+\end{itemize}
+
+A számítási teljesítmény összehasonlításánál fontos azt szem előtt tartani, hogy a mérésekkel csak az adott fordító és függvénykönyvtár implementációkat tudjuk közvetlenül ellenőrízni. Ez abból a szempontból reális hátteret ad a vizsgálatoknak, hogy a programok készítésekor ebből adódnak az egyes futási idők, nem pedig, hogy elvi szinten mire lenne alkalmas az adott programozási nyelv.
+
+A Rust sok elemet átvett a C++-ból, tulajdonképpen annak egy modern alternatívájaként tervezték. A szigorú típusossághoz a C++ sablonokhoz hasonlóan a Rust is biztosít generikus típusokat. Jellemzően itt is a tároló típusokra és a hozzájuk készített algoritmusokra gondolhatunk. A numerikus számítások futási idejét a megfelelő tároló típus, annak megvalósításának hatékonysága is döntően befolyásolhatja. A következő szakaszban azt vizsgáljuk meg, hogy hogy viszonyulnak egymáshoz a Rust és a C++ nyelv hasonló célból készített tárolói, illetve azoknak mennyi a futási idejük.
+
+\Section{Az elterjedt tárolótípusok összehasonlítása}
+
+A Rust az \texttt{std::collections} könyvtárában tartalmazza a gyakran szükséges tárolókat. Ezeket az alábbi 3 fő kategóriába sorolhatjuk:
+\begin{itemize}
+\item szekvenciák: \texttt{Vec}, \texttt{VecDeque} és \texttt{LinkedList},
+\item asszociatív tömbök: \texttt{HashMap}, \texttt{BTreeMap}, és
+\item halmazok: \texttt{HashSet}, \texttt{BTreeSet}.
+\end{itemize}
+A C++ szabványos függvénykönyvtárában hasonlóképpen megtalálhatók ezek az elemek, úgy mint
+\begin{itemize}
+\item szekvenciák: \texttt{array}, \texttt{vector}, \texttt{deque}, \texttt{list},
+\item asszociatív tömbök: \texttt{map}, \texttt{multimap}, \texttt{unordered\_map}, \texttt{unordered\_multimap} és
+\item halmazok: \texttt{set}, \texttt{multiset}, \texttt{unordered\_set}, \texttt{unordered\_multiset}.
+\end{itemize}
+Ezeken kívül mindkét könyvtárban találhatunk további, speciális célú és használati módú tárolókat is. Összehasonlításképpen vizsgáljuk meg az egyszerűbb tárolótípusokat és azok hatékonyságát az említett nyelvekben (\ref{tab:cpp_rust_containers}. táblázat).
+
+\begin{table}
+\centering
+\begin{tabular}{|l|l|l|}
+tároló típus & C++ & Rust \\
+\hline
+vektor & \texttt{vector} & \texttt{Vec} \\
+lista & \texttt{list} & \texttt{LinkedList} \\
+asszociatív tömb & \texttt{map} & \texttt{BTreeMap} \\
+halmaz & \texttt{set} & \texttt{BTreeSet} \\
+\hline
+\end{tabular}
+\caption{A C++ és a Rust alapvető tárolótípusai}
+\label{tab:cpp_rust_containers}
+\end{table}
+
+A Rust esetében láthatjuk, hogy az asszociatív tömbhöz és a halmazhoz is elérhető hasítótáblás és keresőfás implementáció is. A táblázatban azért a keresőfával való összehasonlításra esett a választás, mert tipikusan a C++ megfelelő is olyan adatszerkezettel rendelkezik.
+
+A vizsgálat olyan szempontból nem lehetne teljes értékű, hogy a C++-hoz a szabványos függvénykönyvtáron kívül további függvénykönyvtárak is elérhetők (például \textit{Boost}, \textit{Qt}), amelyek szintén tartalmazzák a vizsgált tárolóknak megfelelő szerkezeteket. Ezek számítási teljesítménye szintén erősen függ az adott implementációtól, a tároló megfelelő használati módjától. Az említett vizsgálat tehát csak a szabványos eszközök összevetésére irányult. A további, szintén C++-al együtt használt könyvtárak vizsgálata túlmutat ezen dolgozat keretein. A továbbiakban a cél az, hogy a minden esetben hatékonyabbnak feltételezett C nyelvű implementációval kerüljön sor az összehasonlításra.
+
+\Section{Fordítóprogram-specifikus beállítások}
+
+Azért, hogy a teljesítmény összehasonlítása reális legyen mindenképpen érdemes megnézni, hogy az adott programozási nyelv fordítója milyen beállítási lehetőségeket biztosít. Nyilvánvalóan fordítónként (akár egy nyelven belül is) különböző lehetőségeink adódnak. A következő szakaszok azt mutatják be, hogy a C és a Rust esetében milyen lehetőségek vannak arra vonatkozóan, hogy közel azonos, tehát egymással összemérhető beállításokat adjunk meg.
+
+\SubSection{A GNU GCC fordítóprogram beállításai}
+
+A C nyelvű implementációk fordításához a GNU GCC fordítóprogramot használtam, ami többféle optimalizálási lehetőséget is kínál \cite{gcc}. Alapértelmezetten, bármilyen opció megadása nélkül a fordító a fordítási időt próbálja minimalizálni.
+\begin{itemize}
+  \item Az \lstinline{-O1} opció bekapcsolja az összes olyan flaget, ami csökkentheti a kód méretét és a futási időt, anélkül, hogy a fordítási időt nagyban növelő opciót használna.
+  \item Az \lstinline{-O2} opció bekapcsolja közel az összes olyan támogatott optimalizálási megoldást, ami nem jár együtt kompromisszumokkal a tárigény és a futási idő között. Tovább növeli a teljesítményt, viszont a fordítási idő is növekedhet az opció használatával.
+  \item Az \lstinline{-O3} opció használ minden optimalizálást, amit az \lstinline{-O2} opció is, és még néhányat azon felül.
+  \item Az \lstinline{-Ofast} opció futási sebességre optimalizál, használ minden optimalizálást, amit az \lstinline{-O3} kapcsoló is, ezeken felül pedig olyan optimalizálásokat is engedélyez, amelyek nem érvények minden szabványos programnak.
+  \item Az \lstinline{-Os} opció a bináris méretére optimalizál. Használ minden optimalizálást, amit az \lstinline{-O2} opció is, kivéve azokat, amelyek sok esetben együtt járnak a tárigény növekedésével. Engedélyezi az \lstinline{-finline-funcions} kapcsolót, amely a fordítót a futási idő helyett a kódméret csökkentésére állítja. 
+\end{itemize}
+% https://gcc.gnu.org/onlinedocs/gcc/Optimize-Options.html
+
+\SubSection{Az CLang fordító beállításai}
+
+A CLang az LLVM virtuális gépe számára készített, C nyelvcsaládba tartozó programozási nyelvek fordítására alkalmas eszköz \cite{llvm}.
+A fordító készítésénél a fejlesztők törekedtek a GCC-vel való kompatibilitásra, így azt külön nem szükséges vizsgálni.
+
+\SubSection{A rustc fordítóprogram beállításai}
+A Rust programkódok a \texttt{rustc} nevű programmal fordíthatók. Az összehasonlítás szempontjából különösen előnyös, hogy ennek paramétere nagyon hasonló a \texttt{gcc} paraméterezéséhez.
+\begin{itemize}
+  \item A \lstinline{-C} vagy \lstinline{--codegen OPT[=VALUE]} opció használata esetén az \lstinline{opt-level} kapcsolóval állítható a fordító által alkalmazott optimalizálás szintje. A szint egyrészt 0-3 közötti egész szám lehet, ahol a 3 jelenti a leginkább optimalizált kimenetet. Az \lstinline{s} és \lstinline{z} szintek a fordítás során létrejövő bináris méretére optimalizál.
+  \item Az \lstinline{-O} opció ekvivalens a \lstinline{-C opt-level=2} használatával.
+\end{itemize}
+
+\Section{A mérésekhez használt eszközök}
 
 A méréseket egy Intel i5-4200U processzorral és 8 GB memóriát használó számítógépen futtattam, 4.20.11-es verziószámú Linux-kernellel. Az általam készített mérések kizárólag ezen az eszközön történtek, ugyanakkor az elkészült programok a forráskód szintjén portábilisek.
 
